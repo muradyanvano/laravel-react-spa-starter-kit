@@ -21,7 +21,45 @@ function isLaravelValidationBody(
     );
 }
 
+function messageFromBody(data: unknown, fallback: string): string {
+    if (
+        typeof data === 'object' &&
+        data !== null &&
+        'message' in data &&
+        typeof data.message === 'string'
+    ) {
+        return data.message;
+    }
+
+    if (
+        typeof data === 'object' &&
+        data !== null &&
+        'status' in data &&
+        typeof data.status === 'string'
+    ) {
+        return data.status;
+    }
+
+    return fallback;
+}
+
+export function isNormalizedApiError(
+    error: unknown,
+): error is NormalizedApiError {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'kind' in error &&
+        'message' in error &&
+        'errors' in error
+    );
+}
+
 export function normalizeApiError(error: unknown): NormalizedApiError {
+    if (isNormalizedApiError(error)) {
+        return error;
+    }
+
     if (!axios.isAxiosError(error)) {
         return {
             kind: 'unknown',
@@ -57,7 +95,10 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
         return {
             kind: 'unauthenticated',
             status,
-            message: 'Unauthenticated.',
+            message: messageFromBody(
+                data,
+                'These credentials do not match our records.',
+            ),
             errors: {},
         };
     }
@@ -66,7 +107,19 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
         return {
             kind: 'forbidden',
             status,
-            message: 'This action is unauthorized.',
+            message: messageFromBody(data, 'This action is unauthorized.'),
+            errors: {},
+        };
+    }
+
+    if (status === 404) {
+        return {
+            kind: 'not_found',
+            status,
+            message: messageFromBody(
+                data,
+                'The requested resource was not found.',
+            ),
             errors: {},
         };
     }
@@ -75,7 +128,19 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
         return {
             kind: 'csrf',
             status,
-            message: 'Your session has expired. Please refresh and try again.',
+            message: 'Your session has expired. Please try again.',
+            errors: {},
+        };
+    }
+
+    if (status === 429) {
+        return {
+            kind: 'throttled',
+            status,
+            message: messageFromBody(
+                data,
+                'Too many attempts. Please wait before trying again.',
+            ),
             errors: {},
         };
     }
@@ -89,18 +154,10 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
         };
     }
 
-    const message =
-        typeof data === 'object' &&
-        data !== null &&
-        'message' in data &&
-        typeof data.message === 'string'
-            ? data.message
-            : (axiosError.message ?? 'Request failed');
-
     return {
         kind: 'unknown',
         status,
-        message,
+        message: messageFromBody(data, axiosError.message ?? 'Request failed'),
         errors: {} as LaravelValidationErrors,
     };
 }

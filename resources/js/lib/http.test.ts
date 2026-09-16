@@ -21,6 +21,19 @@ function axiosErrorFrom(status: number, data: unknown): AxiosError {
 }
 
 describe('normalizeApiError', () => {
+    it('passes through already-normalized API errors', () => {
+        const normalized = {
+            kind: 'validation' as const,
+            status: 422,
+            message: 'The given data was invalid.',
+            errors: {
+                email: ['These credentials do not match our records.'],
+            },
+        };
+
+        expect(normalizeApiError(normalized)).toEqual(normalized);
+    });
+
     it('normalizes Laravel validation errors', () => {
         const error = axiosErrorFrom(422, {
             message: 'The email field is required.',
@@ -53,6 +66,12 @@ describe('normalizeApiError', () => {
 
     it('normalizes CSRF / session expiration responses', () => {
         expect(normalizeApiError(axiosErrorFrom(419, {})).kind).toBe('csrf');
+    });
+
+    it('normalizes throttled responses', () => {
+        expect(normalizeApiError(axiosErrorFrom(429, {})).kind).toBe(
+            'throttled',
+        );
     });
 
     it('normalizes network failures', () => {

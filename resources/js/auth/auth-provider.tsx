@@ -17,6 +17,7 @@ type AuthContextValue = {
     status: AuthStatus;
     isAuthenticated: boolean;
     isLoading: boolean;
+    isVerified: boolean;
     refreshUser: () => Promise<User | null>;
     setUser: (user: User | null) => void;
     logout: () => Promise<void>;
@@ -25,32 +26,34 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUserState] = useState<User | null>(null);
     const [status, setStatus] = useState<AuthStatus>('loading');
+
+    const setUser = useCallback((nextUser: User | null) => {
+        setUserState(nextUser);
+        setStatus(nextUser ? 'authenticated' : 'unauthenticated');
+    }, []);
 
     const refreshUser = useCallback(async (): Promise<User | null> => {
         try {
             const nextUser = await fetchCurrentUser();
             setUser(nextUser);
-            setStatus(nextUser ? 'authenticated' : 'unauthenticated');
 
             return nextUser;
         } catch {
             setUser(null);
-            setStatus('unauthenticated');
 
             return null;
         }
-    }, []);
+    }, [setUser]);
 
     const logout = useCallback(async (): Promise<void> => {
         try {
             await logoutRequest();
         } finally {
             setUser(null);
-            setStatus('unauthenticated');
         }
-    }, []);
+    }, [setUser]);
 
     useEffect(() => {
         void refreshUser();
@@ -62,14 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             status,
             isAuthenticated: status === 'authenticated',
             isLoading: status === 'loading',
+            isVerified: user?.email_verified_at !== null && user !== null,
             refreshUser,
-            setUser: (nextUser) => {
-                setUser(nextUser);
-                setStatus(nextUser ? 'authenticated' : 'unauthenticated');
-            },
+            setUser,
             logout,
         }),
-        [user, status, refreshUser, logout],
+        [user, status, refreshUser, setUser, logout],
     );
 
     return (

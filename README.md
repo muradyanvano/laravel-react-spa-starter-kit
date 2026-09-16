@@ -20,7 +20,7 @@ It is a traditional first-party React SPA backed by Laravel:
 | SPA session auth          | Shared Inertia session     | Sanctum cookie/session SPA auth  |
 | UI goal                   | Official React starter kit | Same visual/UX target            |
 
-UI feature parity with the official kit is intentional and ongoing. This repository currently establishes the **architecture**; full auth/settings UI parity is planned for later phases.
+UI feature parity with the official kit is intentional and ongoing. Authentication UI/flows are implemented in this phase. Settings and 2FA UI remain planned for later phases.
 
 ## Stack
 
@@ -32,7 +32,7 @@ UI feature parity with the official kit is intentional and ongoing. This reposit
 - React Router
 - Vite (+ Vite+)
 - Tailwind CSS 4
-- shadcn/ui (planned / incremental)
+- shadcn/ui (auth components adapted from the official kit)
 - Pest (backend tests)
 - Vitest + Testing Library (frontend tests)
 
@@ -153,20 +153,22 @@ resources/js/
 - React Router frontend architecture
 - Laravel SPA shell + safe fallback routing
 - Sanctum cookie/session SPA wiring
-- Fortify installed and configured (`views` disabled for SPA)
+- Fortify authentication (`views` disabled for SPA)
+- Login, registration, logout, forgot/reset password, email verification UI
+- Intended-route redirects and verified-email gating
+- Official-kit-aligned auth layout + shadcn/ui form components
 - Centralized Axios HTTP layer with Laravel error normalization
-- Auth bootstrap + protected/guest route infrastructure
+- Auth bootstrap + protected/guest/verified route infrastructure
 - Current-user JSON API with safe resource serialization
-- Backend and frontend architecture tests
+- Backend and frontend authentication tests
 - Updated AI agent guidance for non-Inertia SPA work
 
 ## Planned next
 
-- Full auth forms UX matching the official kit
 - Settings experience (profile, password, appearance, 2FA)
-- shadcn/ui component parity and polished layouts
-- Appearance (dark/light/system) behavior parity
-- Broader feature/UI tests
+- Full application layout/sidebar parity with the official kit
+- Passkeys UI
+- Broader end-to-end UI coverage
 
 ## Contribution / development expectations
 

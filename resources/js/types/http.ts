@@ -12,7 +12,9 @@ export type ApiErrorKind =
     | 'validation'
     | 'unauthenticated'
     | 'forbidden'
+    | 'not_found'
     | 'csrf'
+    | 'throttled'
     | 'server'
     | 'network'
     | 'unknown';

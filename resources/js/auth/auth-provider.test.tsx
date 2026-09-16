@@ -157,7 +157,7 @@ describe('auth initialization and route guards', () => {
             id: 1,
             name: 'Test User',
             email: 'test@example.com',
-            email_verified_at: null,
+            email_verified_at: '2026-01-01T00:00:00+00:00',
         });
 
         renderWithAuth(
@@ -166,6 +166,10 @@ describe('auth initialization and route guards', () => {
                 {
                     path: '/dashboard',
                     element: <div>Dashboard page</div>,
+                },
+                {
+                    path: '/verify-email',
+                    element: <div>Verify email page</div>,
                 },
                 {
                     element: <GuestRoute />,

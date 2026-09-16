@@ -1,10 +1,11 @@
 import { useAuth } from '@/auth/auth-provider';
+import { getSafeInternalPath, locationToPath } from '@/lib/navigation';
 import { Navigate, Outlet, useLocation } from 'react-router';
 
 function AuthLoadingScreen() {
     return (
         <div
-            className="flex min-h-screen items-center justify-center bg-[#FDFDFC] text-[#706f6c] dark:bg-[#0a0a0a] dark:text-[#A1A09A]"
+            className="bg-background text-muted-foreground flex min-h-svh items-center justify-center"
             role="status"
             aria-live="polite"
         >
@@ -23,25 +24,60 @@ export function ProtectedRoute() {
 
     if (!isAuthenticated) {
         return (
-            <Navigate to="/login" replace state={{ from: location.pathname }} />
+            <Navigate
+                to="/login"
+                replace
+                state={{ from: locationToPath(location) }}
+            />
         );
     }
 
     return <Outlet />;
 }
 
-export function GuestRoute() {
-    const { isLoading, isAuthenticated } = useAuth();
+export function VerifiedRoute() {
+    const { isLoading, isAuthenticated, isVerified } = useAuth();
     const location = useLocation();
-    const redirectTo =
-        (location.state as { from?: string } | null)?.from ?? '/dashboard';
+
+    if (isLoading) {
+        return <AuthLoadingScreen />;
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <Navigate
+                to="/login"
+                replace
+                state={{ from: locationToPath(location) }}
+            />
+        );
+    }
+
+    if (!isVerified) {
+        return <Navigate to="/verify-email" replace />;
+    }
+
+    return <Outlet />;
+}
+
+export function GuestRoute() {
+    const { isLoading, isAuthenticated, isVerified } = useAuth();
+    const location = useLocation();
+    const intended = getSafeInternalPath(
+        (location.state as { from?: string } | null)?.from,
+        '/dashboard',
+    );
 
     if (isLoading) {
         return <AuthLoadingScreen />;
     }
 
     if (isAuthenticated) {
-        return <Navigate to={redirectTo} replace />;
+        if (!isVerified) {
+            return <Navigate to="/verify-email" replace />;
+        }
+
+        return <Navigate to={intended} replace />;
     }
 
     return <Outlet />;

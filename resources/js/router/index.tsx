@@ -1,4 +1,4 @@
-import { GuestRoute, ProtectedRoute } from '@/router/guards';
+import { GuestRoute, ProtectedRoute, VerifiedRoute } from '@/router/guards';
 import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router';
 
@@ -19,7 +19,13 @@ const NotFoundPage = lazy(() => import('@/pages/not-found'));
 
 function LazyPage({ children }: { children: ReactNode }) {
     return (
-        <Suspense fallback={<div className="p-6">Loading…</div>}>
+        <Suspense
+            fallback={
+                <div className="bg-background text-muted-foreground p-6">
+                    Loading…
+                </div>
+            }
+        >
             {children}
         </Suspense>
     );
@@ -75,18 +81,23 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
             {
-                path: '/dashboard',
-                element: (
-                    <LazyPage>
-                        <DashboardPage />
-                    </LazyPage>
-                ),
-            },
-            {
                 path: '/verify-email',
                 element: (
                     <LazyPage>
                         <VerifyEmailPage />
+                    </LazyPage>
+                ),
+            },
+        ],
+    },
+    {
+        element: <VerifiedRoute />,
+        children: [
+            {
+                path: '/dashboard',
+                element: (
+                    <LazyPage>
+                        <DashboardPage />
                     </LazyPage>
                 ),
             },

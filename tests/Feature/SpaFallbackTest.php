@@ -39,6 +39,16 @@ test('does not swallow sanctum csrf cookie route', function () {
     $response->assertNoContent();
 });
 
+test('does not swallow fortify email verification routes', function () {
+    $response = $this->get('/email/verify/1/invalid');
+
+    $response->assertRedirect(route('login'));
+});
+
+test('health endpoint remains available', function () {
+    $this->get('/up')->assertOk();
+});
+
 test('serves the spa shell for paths that share a prefix with reserved routes', function () {
     $this->get('/upload')->assertOk()->assertViewIs('app');
     $this->get('/api-docs')->assertOk()->assertViewIs('app');

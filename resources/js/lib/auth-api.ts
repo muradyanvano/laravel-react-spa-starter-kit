@@ -1,10 +1,21 @@
-import { ensureCsrfCookie, http, normalizeApiError } from '@/lib/http';
+import {
+    ensureCsrfCookie,
+    http,
+    isNormalizedApiError,
+    normalizeApiError,
+} from '@/lib/http';
 import type { User } from '@/types/auth';
-import type { NormalizedApiError } from '@/types/http';
 import axios from 'axios';
+
+export { isNormalizedApiError };
 
 type UserResponse = {
     data: User;
+};
+
+type StatusResponse = {
+    status?: string;
+    message?: string;
 };
 
 export async function fetchCurrentUser(): Promise<User | null> {
@@ -21,19 +32,78 @@ export async function fetchCurrentUser(): Promise<User | null> {
     }
 }
 
+export async function login(credentials: {
+    email: string;
+    password: string;
+    remember: boolean;
+}): Promise<void> {
+    await ensureCsrfCookie();
+    await http.post('/login', {
+        email: credentials.email,
+        password: credentials.password,
+        remember: credentials.remember,
+    });
+}
+
+export async function register(payload: {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}): Promise<void> {
+    await ensureCsrfCookie();
+    await http.post('/register', payload);
+}
+
+export async function requestPasswordReset(email: string): Promise<string> {
+    await ensureCsrfCookie();
+
+    const response = await http.post<StatusResponse>('/forgot-password', {
+        email,
+    });
+
+    return (
+        response.data.status ??
+        response.data.message ??
+        'We have emailed your password reset link.'
+    );
+}
+
+export async function resetPassword(payload: {
+    token: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}): Promise<string> {
+    await ensureCsrfCookie();
+
+    const response = await http.post<StatusResponse>(
+        '/reset-password',
+        payload,
+    );
+
+    return (
+        response.data.status ??
+        response.data.message ??
+        'Your password has been reset.'
+    );
+}
+
+export async function resendVerificationEmail(): Promise<string> {
+    await ensureCsrfCookie();
+
+    const response = await http.post<StatusResponse>(
+        '/email/verification-notification',
+    );
+
+    return (
+        response.data.status ??
+        response.data.message ??
+        'verification-link-sent'
+    );
+}
+
 export async function logout(): Promise<void> {
     await ensureCsrfCookie();
     await http.post('/logout');
-}
-
-export function isNormalizedApiError(
-    error: unknown,
-): error is NormalizedApiError {
-    return (
-        typeof error === 'object' &&
-        error !== null &&
-        'kind' in error &&
-        'message' in error &&
-        'errors' in error
-    );
 }
