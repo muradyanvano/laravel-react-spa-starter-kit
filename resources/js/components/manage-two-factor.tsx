@@ -5,9 +5,12 @@ import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import { normalizeApiError } from '@/lib/http';
+import { locationToPath } from '@/lib/navigation';
+import { navigateToConfirmPasswordIfRequired } from '@/lib/password-confirmation';
 import { disableTwoFactor, enableTwoFactor } from '@/lib/settings-api';
 import { ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 export type Props = {
     canManageTwoFactor?: boolean;
@@ -33,6 +36,8 @@ export default function ManageTwoFactor({
         fetchRecoveryCodes,
         errors,
     } = useTwoFactorAuth();
+    const navigate = useNavigate();
+    const from = locationToPath(useLocation());
     const [showSetupModal, setShowSetupModal] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [actionError, setActionError] = useState<string | null>(null);
@@ -60,6 +65,10 @@ export default function ManageTwoFactor({
 
             return true;
         } catch (error) {
+            if (navigateToConfirmPasswordIfRequired(error, navigate, from)) {
+                return false;
+            }
+
             setActionError(normalizeApiError(error).message);
 
             return false;

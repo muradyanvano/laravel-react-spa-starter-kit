@@ -1,4 +1,9 @@
-import { ensureCsrfCookie, http, normalizeApiError } from '@/lib/http';
+import {
+    ensureCsrfCookie,
+    http,
+    isRequestAborted,
+    normalizeApiError,
+} from '@/lib/http';
 import { confirmation as confirmedPasswordStatus } from '@/routes/password';
 import { store as confirmPasswordRoute } from '@/routes/password/confirm';
 import {
@@ -73,14 +78,21 @@ export async function deleteAccount(payload: {
     await http.delete(PROFILE_DESTROY_URL, { data: payload });
 }
 
-export async function fetchSecuritySettings(): Promise<SecuritySettings> {
+export async function fetchSecuritySettings(options?: {
+    signal?: AbortSignal;
+}): Promise<SecuritySettings> {
     try {
         const response = await http.get<MaybeWrapped<SecuritySettings>>(
             SECURITY_SETTINGS_URL,
+            { signal: options?.signal },
         );
 
         return unwrap(response.data);
     } catch (error) {
+        if (isRequestAborted(error)) {
+            throw error;
+        }
+
         throw normalizeApiError(error);
     }
 }
@@ -152,14 +164,21 @@ export async function confirmPassword(payload: {
     await http.post(confirmPasswordRoute.url(), payload);
 }
 
-export async function fetchPasswordConfirmationStatus(): Promise<PasswordConfirmationStatus> {
+export async function fetchPasswordConfirmationStatus(options?: {
+    signal?: AbortSignal;
+}): Promise<PasswordConfirmationStatus> {
     try {
         const response = await http.get<PasswordConfirmationStatus>(
             confirmedPasswordStatus.url(),
+            { signal: options?.signal },
         );
 
         return { confirmed: response.data.confirmed === true };
     } catch (error) {
+        if (isRequestAborted(error)) {
+            throw error;
+        }
+
         throw normalizeApiError(error);
     }
 }

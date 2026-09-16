@@ -64,7 +64,7 @@ export default function Profile() {
                         <Input
                             id="name"
                             name="name"
-                            className="mt-1 block w-full"
+                            className="block w-full"
                             required
                             autoComplete="name"
                             placeholder="Full name"
@@ -82,7 +82,6 @@ export default function Profile() {
 
                         <InputError
                             id={fieldErrorId('name')}
-                            className="mt-2"
                             message={form.errors.name}
                         />
                     </div>
@@ -94,7 +93,7 @@ export default function Profile() {
                             id="email"
                             type="email"
                             name="email"
-                            className="mt-1 block w-full"
+                            className="block w-full"
                             required
                             autoComplete="username"
                             placeholder="Email address"
@@ -112,7 +111,6 @@ export default function Profile() {
 
                         <InputError
                             id={fieldErrorId('email')}
-                            className="mt-2"
                             message={form.errors.email}
                         />
                     </div>

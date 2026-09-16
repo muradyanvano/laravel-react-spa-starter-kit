@@ -42,6 +42,10 @@ function renderLogin(initialEntry = '/login') {
                         path="/register"
                         element={<div>Register page</div>}
                     />
+                    <Route
+                        path="/confirm-password"
+                        element={<div>Confirm password page</div>}
+                    />
                 </Routes>
             </MemoryRouter>
         </AuthProvider>,
@@ -121,6 +125,61 @@ describe('Login page', () => {
         await waitFor(() => {
             expect(screen.getByText('Dashboard page')).toBeInTheDocument();
         });
+
+        // Bootstrap guest fetch + one explicit refresh after login.
+        expect(mockedFetchCurrentUser).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not resume confirm-password as the post-login destination', async () => {
+        const user = userEvent.setup();
+        mockedLogin.mockResolvedValue({ two_factor: false });
+        mockedFetchCurrentUser
+            .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce({
+                id: 1,
+                name: 'Test User',
+                email: 'test@example.com',
+                email_verified_at: '2026-01-01T00:00:00+00:00',
+            });
+
+        render(
+            <AuthProvider>
+                <MemoryRouter
+                    initialEntries={[
+                        {
+                            pathname: '/login',
+                            state: { from: '/confirm-password' },
+                        },
+                    ]}
+                >
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route
+                            path="/dashboard"
+                            element={<div>Dashboard page</div>}
+                        />
+                        <Route
+                            path="/confirm-password"
+                            element={<div>Confirm password page</div>}
+                        />
+                    </Routes>
+                </MemoryRouter>
+            </AuthProvider>,
+        );
+
+        await user.type(
+            await screen.findByLabelText('Email address'),
+            'a@b.com',
+        );
+        await user.type(screen.getByLabelText('Password'), 'password');
+        await user.click(screen.getByRole('button', { name: 'Log in' }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Dashboard page')).toBeInTheDocument();
+        });
+        expect(
+            screen.queryByText('Confirm password page'),
+        ).not.toBeInTheDocument();
     });
 
     it('disables the submit button while processing', async () => {

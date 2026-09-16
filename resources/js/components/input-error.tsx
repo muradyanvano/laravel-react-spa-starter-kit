@@ -1,6 +1,11 @@
 import type { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Field validation message. Place as the last child of a `grid gap-2` field
+ * unit (Label, Input, InputError). Do not add top margin — the grid gap owns
+ * spacing between the control and this message.
+ */
 export default function InputError({
     message,
     className = '',

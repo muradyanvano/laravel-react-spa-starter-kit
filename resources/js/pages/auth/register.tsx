@@ -79,7 +79,6 @@ export default function Register() {
                         <InputError
                             id={fieldErrorId('name')}
                             message={form.errors.name}
-                            className="mt-2"
                         />
                     </div>
 

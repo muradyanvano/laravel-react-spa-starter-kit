@@ -69,7 +69,7 @@ export default function ResetPassword() {
                             name="email"
                             autoComplete="email"
                             value={form.data.email}
-                            className="mt-1 block w-full"
+                            className="block w-full"
                             readOnly
                             aria-invalid={Boolean(form.errors.email)}
                             aria-describedby={fieldDescribedBy(
@@ -80,7 +80,6 @@ export default function ResetPassword() {
                         <InputError
                             id={fieldErrorId('email')}
                             message={form.errors.email}
-                            className="mt-2"
                         />
                     </div>
 
@@ -90,7 +89,7 @@ export default function ResetPassword() {
                             id="password"
                             name="password"
                             autoComplete="new-password"
-                            className="mt-1 block w-full"
+                            className="block w-full"
                             autoFocus
                             placeholder="Password"
                             value={form.data.password}
@@ -118,7 +117,7 @@ export default function ResetPassword() {
                             id="password_confirmation"
                             name="password_confirmation"
                             autoComplete="new-password"
-                            className="mt-1 block w-full"
+                            className="block w-full"
                             placeholder="Confirm password"
                             value={form.data.password_confirmation}
                             onChange={(event) =>
@@ -139,7 +138,6 @@ export default function ResetPassword() {
                         <InputError
                             id={fieldErrorId('password_confirmation')}
                             message={form.errors.password_confirmation}
-                            className="mt-2"
                         />
                     </div>
 

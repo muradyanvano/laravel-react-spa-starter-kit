@@ -1,41 +1,29 @@
 import { AuthSessionBridge } from '@/auth/auth-session-bridge';
+import { useAuth } from '@/auth/auth-provider';
+import { AppLoader } from '@/components/app-loader';
+import ConfirmPasswordPage from '@/pages/auth/confirm-password';
+import ForgotPasswordPage from '@/pages/auth/forgot-password';
+import LoginPage from '@/pages/auth/login';
+import RegisterPage from '@/pages/auth/register';
+import ResetPasswordPage from '@/pages/auth/reset-password';
+import TwoFactorChallengePage from '@/pages/auth/two-factor-challenge';
+import VerifyEmailPage from '@/pages/auth/verify-email';
+import DashboardPage from '@/pages/dashboard';
+import NotFoundPage from '@/pages/not-found';
+import AppearanceSettingsPage from '@/pages/settings/appearance';
+import ProfileSettingsPage from '@/pages/settings/profile';
+import SecuritySettingsPage from '@/pages/settings/security';
+import WelcomePage from '@/pages/welcome';
 import { GuestRoute, ProtectedRoute, VerifiedRoute } from '@/router/guards';
-import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 
-const WelcomePage = lazy(() => import('@/pages/welcome'));
-const DashboardPage = lazy(() => import('@/pages/dashboard'));
-const LoginPage = lazy(() => import('@/pages/auth/login'));
-const RegisterPage = lazy(() => import('@/pages/auth/register'));
-const ForgotPasswordPage = lazy(() => import('@/pages/auth/forgot-password'));
-const ResetPasswordPage = lazy(() => import('@/pages/auth/reset-password'));
-const VerifyEmailPage = lazy(() => import('@/pages/auth/verify-email'));
-const ConfirmPasswordPage = lazy(() => import('@/pages/auth/confirm-password'));
-const TwoFactorChallengePage = lazy(
-    () => import('@/pages/auth/two-factor-challenge'),
-);
-const ProfileSettingsPage = lazy(() => import('@/pages/settings/profile'));
-const SecuritySettingsPage = lazy(() => import('@/pages/settings/security'));
-const AppearanceSettingsPage = lazy(
-    () => import('@/pages/settings/appearance'),
-);
-const NotFoundPage = lazy(() => import('@/pages/not-found'));
-
-function LazyPage({ children }: { children: ReactNode }) {
-    return (
-        <Suspense
-            fallback={
-                <div className="bg-background text-muted-foreground p-6">
-                    Loading…
-                </div>
-            }
-        >
-            {children}
-        </Suspense>
-    );
-}
-
 function RootLayout() {
+    const { isLoading } = useAuth();
+
+    if (isLoading) {
+        return <AppLoader />;
+    }
+
     return (
         <>
             <AuthSessionBridge />
@@ -50,54 +38,30 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: (
-                    <LazyPage>
-                        <WelcomePage />
-                    </LazyPage>
-                ),
+                element: <WelcomePage />,
             },
             {
                 element: <GuestRoute />,
                 children: [
                     {
                         path: '/login',
-                        element: (
-                            <LazyPage>
-                                <LoginPage />
-                            </LazyPage>
-                        ),
+                        element: <LoginPage />,
                     },
                     {
                         path: '/register',
-                        element: (
-                            <LazyPage>
-                                <RegisterPage />
-                            </LazyPage>
-                        ),
+                        element: <RegisterPage />,
                     },
                     {
                         path: '/forgot-password',
-                        element: (
-                            <LazyPage>
-                                <ForgotPasswordPage />
-                            </LazyPage>
-                        ),
+                        element: <ForgotPasswordPage />,
                     },
                     {
                         path: '/reset-password/:token',
-                        element: (
-                            <LazyPage>
-                                <ResetPasswordPage />
-                            </LazyPage>
-                        ),
+                        element: <ResetPasswordPage />,
                     },
                     {
                         path: '/two-factor-challenge',
-                        element: (
-                            <LazyPage>
-                                <TwoFactorChallengePage />
-                            </LazyPage>
-                        ),
+                        element: <TwoFactorChallengePage />,
                     },
                 ],
             },
@@ -106,19 +70,11 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: '/verify-email',
-                        element: (
-                            <LazyPage>
-                                <VerifyEmailPage />
-                            </LazyPage>
-                        ),
+                        element: <VerifyEmailPage />,
                     },
                     {
                         path: '/confirm-password',
-                        element: (
-                            <LazyPage>
-                                <ConfirmPasswordPage />
-                            </LazyPage>
-                        ),
+                        element: <ConfirmPasswordPage />,
                     },
                 ],
             },
@@ -127,11 +83,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: '/dashboard',
-                        element: (
-                            <LazyPage>
-                                <DashboardPage />
-                            </LazyPage>
-                        ),
+                        element: <DashboardPage />,
                     },
                     {
                         path: '/settings',
@@ -144,27 +96,15 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: 'profile',
-                                element: (
-                                    <LazyPage>
-                                        <ProfileSettingsPage />
-                                    </LazyPage>
-                                ),
+                                element: <ProfileSettingsPage />,
                             },
                             {
                                 path: 'security',
-                                element: (
-                                    <LazyPage>
-                                        <SecuritySettingsPage />
-                                    </LazyPage>
-                                ),
+                                element: <SecuritySettingsPage />,
                             },
                             {
                                 path: 'appearance',
-                                element: (
-                                    <LazyPage>
-                                        <AppearanceSettingsPage />
-                                    </LazyPage>
-                                ),
+                                element: <AppearanceSettingsPage />,
                             },
                             {
                                 path: 'password',
@@ -184,11 +124,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: '*',
-                element: (
-                    <LazyPage>
-                        <NotFoundPage />
-                    </LazyPage>
-                ),
+                element: <NotFoundPage />,
             },
         ],
     },

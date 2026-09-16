@@ -150,16 +150,8 @@ describe('auth session HTTP handling', () => {
         expect(screen.getByTestId('from')).toHaveTextContent('/');
     });
 
-    it('navigates to confirm-password on 423 without replaying the mutation', async () => {
-        let postCount = 0;
-
-        http.defaults.adapter = async (config) => {
-            if ((config.method ?? 'get').toLowerCase() === 'post') {
-                postCount += 1;
-            }
-
-            return rejectWithStatus(423)(config);
-        };
+    it('does not globally navigate to confirm-password on 423', async () => {
+        http.defaults.adapter = rejectWithStatus(423);
 
         const router = createMemoryRouter(
             [
@@ -196,15 +188,14 @@ describe('auth session HTTP handling', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('path')).toHaveTextContent(
-                '/confirm-password',
+                '/settings/security',
             );
         });
 
-        expect(screen.getByTestId('from')).toHaveTextContent(
-            '/settings/security',
-        );
         expect(screen.getByTestId('status')).toHaveTextContent('authenticated');
-        expect(postCount).toBe(1);
+        expect(screen.queryByTestId('path')?.textContent).not.toBe(
+            '/confirm-password',
+        );
     });
 
     it('does not redirect guest credential 401 responses to login loops', async () => {

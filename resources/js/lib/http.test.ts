@@ -87,3 +87,13 @@ describe('normalizeApiError', () => {
         expect(normalizeApiError(error).kind).toBe('network');
     });
 });
+
+describe('isRequestAborted', () => {
+    it('detects axios canceled errors', async () => {
+        const { isRequestAborted } = await import('@/lib/http');
+        const error = new AxiosError('canceled', AxiosError.ERR_CANCELED);
+
+        expect(isRequestAborted(error)).toBe(true);
+        expect(isRequestAborted(new Error('nope'))).toBe(false);
+    });
+});

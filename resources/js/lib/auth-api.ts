@@ -2,12 +2,13 @@ import {
     ensureCsrfCookie,
     http,
     isNormalizedApiError,
+    isRequestAborted,
     normalizeApiError,
 } from '@/lib/http';
 import type { User } from '@/types/auth';
 import axios from 'axios';
 
-export { isNormalizedApiError };
+export { isNormalizedApiError, isRequestAborted };
 
 type UserResponse = {
     data: User;
@@ -23,12 +24,20 @@ export type LoginResult = {
     two_factor: boolean;
 };
 
-export async function fetchCurrentUser(): Promise<User | null> {
+export async function fetchCurrentUser(options?: {
+    signal?: AbortSignal;
+}): Promise<User | null> {
     try {
-        const response = await http.get<UserResponse>('/api/v1/user');
+        const response = await http.get<UserResponse>('/api/v1/user', {
+            signal: options?.signal,
+        });
 
         return response.data.data;
     } catch (error) {
+        if (isRequestAborted(error)) {
+            throw error;
+        }
+
         if (axios.isAxiosError(error) && error.response?.status === 401) {
             return null;
         }

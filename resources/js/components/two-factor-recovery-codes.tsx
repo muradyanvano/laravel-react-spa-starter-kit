@@ -8,9 +8,12 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { normalizeApiError } from '@/lib/http';
+import { locationToPath } from '@/lib/navigation';
+import { navigateToConfirmPasswordIfRequired } from '@/lib/password-confirmation';
 import { regenerateRecoveryCodes } from '@/lib/settings-api';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 type Props = {
     recoveryCodesList: string[];
@@ -28,6 +31,8 @@ export default function TwoFactorRecoveryCodes({
     const [processing, setProcessing] = useState(false);
     const [regenerateError, setRegenerateError] = useState<string | null>(null);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
+    const navigate = useNavigate();
+    const from = locationToPath(useLocation());
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
 
     const toggleCodesVisibility = useCallback(async () => {
@@ -64,11 +69,15 @@ export default function TwoFactorRecoveryCodes({
             await fetchRecoveryCodes();
             setCodesAreVisible(true);
         } catch (error) {
+            if (navigateToConfirmPasswordIfRequired(error, navigate, from)) {
+                return;
+            }
+
             setRegenerateError(normalizeApiError(error).message);
         } finally {
             setProcessing(false);
         }
-    }, [fetchRecoveryCodes]);
+    }, [fetchRecoveryCodes, from, navigate]);
 
     const RecoveryCodeIconComponent = codesAreVisible ? EyeOff : Eye;
     const visibleErrors = regenerateError

@@ -70,27 +70,18 @@ describe('Welcome page navigation', () => {
         ).not.toBeInTheDocument();
     });
 
-    it('hides auth links while auth is loading', async () => {
-        let resolveUser: (value: null) => void = () => undefined;
-        mockedFetchCurrentUser.mockImplementation(
-            () =>
-                new Promise((resolve) => {
-                    resolveUser = resolve;
-                }),
-        );
+    it('does not show a plain Loading text placeholder', async () => {
+        mockedFetchCurrentUser.mockResolvedValue(null);
 
         renderWelcome();
-
-        expect(
-            screen.queryByRole('link', { name: 'Log in' }),
-        ).not.toBeInTheDocument();
-
-        resolveUser(null);
 
         await waitFor(() => {
             expect(
                 screen.getByRole('link', { name: 'Log in' }),
             ).toBeInTheDocument();
         });
+
+        expect(screen.queryByText('Loading…')).not.toBeInTheDocument();
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 });

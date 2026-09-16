@@ -70,6 +70,8 @@ npm install
 npm run build
 ```
 
+`npm run build` and `npm run dev` run Laravel Wayfinder via `@laravel/vite-plugin-wayfinder` (`php artisan wayfinder:generate --with-form`). That regenerates gitignored TypeScript helpers under `resources/js/actions`, `resources/js/routes`, and `resources/js/wayfinder`. Fresh clones do not need those directories committed; generation happens automatically on Vite build/dev start. You can also run `php artisan wayfinder:generate --with-form` manually.
+
 ## Development
 
 ```bash

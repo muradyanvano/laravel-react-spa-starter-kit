@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSafeInternalPath } from '@/lib/navigation';
+import { getPostAuthPath, getSafeInternalPath } from '@/lib/navigation';
 
 describe('getSafeInternalPath', () => {
     it('accepts internal spa paths', () => {
@@ -19,5 +19,17 @@ describe('getSafeInternalPath', () => {
         expect(getSafeInternalPath('http://evil.test/path')).toBe('/dashboard');
         expect(getSafeInternalPath(null)).toBe('/dashboard');
         expect(getSafeInternalPath('')).toBe('/dashboard');
+    });
+});
+
+describe('getPostAuthPath', () => {
+    it('avoids resuming confirm-password after login', () => {
+        expect(getPostAuthPath('/confirm-password')).toBe('/dashboard');
+        expect(getPostAuthPath('/confirm-password?x=1')).toBe('/dashboard');
+    });
+
+    it('preserves other safe intended paths', () => {
+        expect(getPostAuthPath('/settings/profile')).toBe('/settings/profile');
+        expect(getPostAuthPath('/dashboard')).toBe('/dashboard');
     });
 });

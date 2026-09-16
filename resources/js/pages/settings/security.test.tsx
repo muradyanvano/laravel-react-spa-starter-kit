@@ -1,6 +1,6 @@
 import { VerifiedRoute } from '@/router/guards';
 import { TestProviders } from '@/testing/test-providers';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import Security from '@/pages/settings/security';
@@ -24,6 +24,7 @@ vi.mock('@/lib/settings-api', () => ({
 import { fetchCurrentUser } from '@/lib/auth-api';
 import {
     fetchPasswordConfirmationStatus,
+    fetchRecoveryCodes,
     fetchSecuritySettings,
 } from '@/lib/settings-api';
 
@@ -32,6 +33,7 @@ const mockedFetchPasswordConfirmationStatus = vi.mocked(
     fetchPasswordConfirmationStatus,
 );
 const mockedFetchSecuritySettings = vi.mocked(fetchSecuritySettings);
+const mockedFetchRecoveryCodes = vi.mocked(fetchRecoveryCodes);
 
 const verifiedUser = {
     id: 1,
@@ -47,10 +49,10 @@ const securitySettings = {
     passwordRules: 'min:8',
 };
 
-function renderSecurity() {
+function renderSecurity(initialEntry = '/settings/security') {
     return render(
         <TestProviders>
-            <MemoryRouter initialEntries={['/settings/security']}>
+            <MemoryRouter initialEntries={[initialEntry]}>
                 <Routes>
                     <Route element={<VerifiedRoute />}>
                         <Route
@@ -58,6 +60,10 @@ function renderSecurity() {
                             element={<Security />}
                         />
                     </Route>
+                    <Route
+                        path="/confirm-password"
+                        element={<div>Confirm password page</div>}
+                    />
                 </Routes>
             </MemoryRouter>
         </TestProviders>,
@@ -69,11 +75,73 @@ describe('Security settings page', () => {
         mockedFetchCurrentUser.mockReset();
         mockedFetchPasswordConfirmationStatus.mockReset();
         mockedFetchSecuritySettings.mockReset();
+        mockedFetchRecoveryCodes.mockReset();
         mockedFetchCurrentUser.mockResolvedValue(verifiedUser);
         mockedFetchPasswordConfirmationStatus.mockResolvedValue({
             confirmed: true,
         });
         mockedFetchSecuritySettings.mockResolvedValue(securitySettings);
+    });
+
+    it('shows a skeleton before password controls appear', async () => {
+        let resolveConfirmation: (value: { confirmed: boolean }) => void = () =>
+            undefined;
+
+        mockedFetchPasswordConfirmationStatus.mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolveConfirmation = resolve;
+                }),
+        );
+
+        renderSecurity();
+
+        expect(
+            await screen.findByTestId('security-skeleton'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByLabelText('Current password'),
+        ).not.toBeInTheDocument();
+
+        resolveConfirmation({ confirmed: true });
+
+        expect(
+            await screen.findByLabelText('Current password'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByTestId('security-skeleton'),
+        ).not.toBeInTheDocument();
+    });
+
+    it('calls confirmation-status and security settings once during initialization', async () => {
+        renderSecurity();
+
+        expect(
+            await screen.findByLabelText('Current password'),
+        ).toBeInTheDocument();
+
+        expect(mockedFetchPasswordConfirmationStatus).toHaveBeenCalledTimes(1);
+        expect(mockedFetchSecuritySettings).toHaveBeenCalledTimes(1);
+        expect(mockedFetchRecoveryCodes).not.toHaveBeenCalled();
+    });
+
+    it('does not fetch recovery codes when two-factor is already enabled', async () => {
+        mockedFetchSecuritySettings.mockResolvedValue({
+            ...securitySettings,
+            twoFactorEnabled: true,
+        });
+
+        renderSecurity();
+
+        expect(
+            await screen.findByRole('button', { name: 'Disable 2FA' }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: /View recovery codes/i }),
+        ).toBeInTheDocument();
+        expect(mockedFetchRecoveryCodes).not.toHaveBeenCalled();
+        expect(mockedFetchPasswordConfirmationStatus).toHaveBeenCalledTimes(1);
+        expect(mockedFetchSecuritySettings).toHaveBeenCalledTimes(1);
     });
 
     it('shows the password form and two-factor section when settings are loaded', async () => {
@@ -92,5 +160,51 @@ describe('Security settings page', () => {
         expect(
             screen.getByRole('button', { name: 'Enable 2FA' }),
         ).toBeInTheDocument();
+    });
+
+    it('redirects to confirm-password when confirmation is required', async () => {
+        mockedFetchPasswordConfirmationStatus.mockResolvedValue({
+            confirmed: false,
+        });
+
+        renderSecurity();
+
+        expect(
+            await screen.findByText('Confirm password page'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByLabelText('Current password'),
+        ).not.toBeInTheDocument();
+        expect(mockedFetchSecuritySettings).not.toHaveBeenCalled();
+    });
+
+    it('does not flash password inputs while redirecting for confirmation', async () => {
+        let resolveConfirmation: (value: { confirmed: boolean }) => void = () =>
+            undefined;
+
+        mockedFetchPasswordConfirmationStatus.mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolveConfirmation = resolve;
+                }),
+        );
+
+        renderSecurity();
+
+        expect(
+            await screen.findByTestId('security-skeleton'),
+        ).toBeInTheDocument();
+
+        resolveConfirmation({ confirmed: false });
+
+        await waitFor(() => {
+            expect(
+                screen.getByText('Confirm password page'),
+            ).toBeInTheDocument();
+        });
+
+        expect(
+            screen.queryByLabelText('Current password'),
+        ).not.toBeInTheDocument();
     });
 });

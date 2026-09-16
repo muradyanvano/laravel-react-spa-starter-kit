@@ -11,7 +11,7 @@ import {
 import { fieldDescribedBy, fieldErrorId, useForm } from '@/hooks/use-form';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import AuthLayout from '@/layouts/auth-layout';
-import { getSafeInternalPath } from '@/lib/navigation';
+import { getPostAuthPath } from '@/lib/navigation';
 import { submitTwoFactorChallenge } from '@/lib/settings-api';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
@@ -24,7 +24,7 @@ export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState(false);
     const form = useForm({ code: '', recovery_code: '' });
 
-    const intended = getSafeInternalPath(
+    const intended = getPostAuthPath(
         (location.state as { from?: string } | null)?.from,
         '/dashboard',
     );

@@ -1,25 +1,21 @@
 import { useAuth } from '@/auth/auth-provider';
-import { getSafeInternalPath, locationToPath } from '@/lib/navigation';
+import { getPostAuthPath, locationToPath } from '@/lib/navigation';
 import { Navigate, Outlet, useLocation } from 'react-router';
 
-function AuthLoadingScreen() {
-    return (
-        <div
-            className="bg-background text-muted-foreground flex min-h-svh items-center justify-center"
-            role="status"
-            aria-live="polite"
-        >
-            <span className="text-sm">Loading…</span>
-        </div>
-    );
+/**
+ * While auth is resolving, render nothing. RootLayout owns the AppLoader
+ * so guards never flash a second loader or redirect prematurely.
+ */
+function waitForAuth(isLoading: boolean): boolean {
+    return isLoading;
 }
 
 export function ProtectedRoute() {
     const { isLoading, isAuthenticated } = useAuth();
     const location = useLocation();
 
-    if (isLoading) {
-        return <AuthLoadingScreen />;
+    if (waitForAuth(isLoading)) {
+        return null;
     }
 
     if (!isAuthenticated) {
@@ -39,8 +35,8 @@ export function VerifiedRoute() {
     const { isLoading, isAuthenticated, isVerified } = useAuth();
     const location = useLocation();
 
-    if (isLoading) {
-        return <AuthLoadingScreen />;
+    if (waitForAuth(isLoading)) {
+        return null;
     }
 
     if (!isAuthenticated) {
@@ -63,13 +59,13 @@ export function VerifiedRoute() {
 export function GuestRoute() {
     const { isLoading, isAuthenticated, isVerified } = useAuth();
     const location = useLocation();
-    const intended = getSafeInternalPath(
+    const intended = getPostAuthPath(
         (location.state as { from?: string } | null)?.from,
         '/dashboard',
     );
 
-    if (isLoading) {
-        return <AuthLoadingScreen />;
+    if (waitForAuth(isLoading)) {
+        return null;
     }
 
     if (isAuthenticated) {

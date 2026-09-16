@@ -22,8 +22,8 @@ function isGuestAuthPath(pathname: string): boolean {
 }
 
 /**
- * Bridges Axios session-auth statuses to AuthProvider + React Router.
- * Mount once under the router tree (see router root layout).
+ * Bridges Axios session-expiration 401 to AuthProvider + React Router.
+ * Password-confirmation (423) is handled contextually by sensitive callers.
  */
 export function AuthSessionBridge() {
     const { status, setUser } = useAuth();
@@ -53,27 +53,6 @@ export function AuthSessionBridge() {
                 const intended = getSafeInternalPath(locationToPath(current));
 
                 void navigate('/login', {
-                    replace: true,
-                    state: { from: intended },
-                });
-            },
-            onPasswordConfirmationRequired: () => {
-                if (statusRef.current !== 'authenticated') {
-                    return;
-                }
-
-                const current = locationRef.current;
-
-                if (current.pathname === '/confirm-password') {
-                    return;
-                }
-
-                const intended = getSafeInternalPath(
-                    locationToPath(current),
-                    '/settings/security',
-                );
-
-                void navigate('/confirm-password', {
                     replace: true,
                     state: { from: intended },
                 });

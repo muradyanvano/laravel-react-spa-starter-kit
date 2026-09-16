@@ -11,7 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { fieldDescribedBy, fieldErrorId, useForm } from '@/hooks/use-form';
 import AuthLayout from '@/layouts/auth-layout';
 import { login as loginRequest } from '@/lib/auth-api';
-import { getSafeInternalPath } from '@/lib/navigation';
+import { getPostAuthPath } from '@/lib/navigation';
 import { useLocation, useNavigate } from 'react-router';
 
 const canResetPassword = true;
@@ -30,7 +30,7 @@ export default function Login() {
         remember: false as boolean,
     });
 
-    const intended = getSafeInternalPath(
+    const intended = getPostAuthPath(
         (location.state as { from?: string } | null)?.from,
         '/dashboard',
     );

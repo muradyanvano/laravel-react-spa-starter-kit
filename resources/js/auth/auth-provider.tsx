@@ -1,4 +1,4 @@
-import { setAuthSessionHandlersSuppressed } from '@/lib/http';
+import { isRequestAborted, setAuthSessionHandlersSuppressed } from '@/lib/http';
 import { fetchCurrentUser, logout as logoutRequest } from '@/lib/auth-api';
 import type { User } from '@/types/auth';
 import {
@@ -41,7 +41,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(nextUser);
 
             return nextUser;
-        } catch {
+        } catch (error) {
+            if (isRequestAborted(error)) {
+                return null;
+            }
+
             setUser(null);
 
             return null;
@@ -57,21 +61,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [setUser]);
 
     useEffect(() => {
-        let cancelled = false;
+        const controller = new AbortController();
+        let active = true;
 
         setAuthSessionHandlersSuppressed(true);
 
-        void refreshUser().finally(() => {
-            if (!cancelled) {
-                setAuthSessionHandlersSuppressed(false);
+        void (async () => {
+            try {
+                const nextUser = await fetchCurrentUser({
+                    signal: controller.signal,
+                });
+
+                if (!active) {
+                    return;
+                }
+
+                setUser(nextUser);
+            } catch (error) {
+                if (!active || isRequestAborted(error)) {
+                    return;
+                }
+
+                setUser(null);
+            } finally {
+                if (active) {
+                    setAuthSessionHandlersSuppressed(false);
+                }
             }
-        });
+        })();
 
         return () => {
-            cancelled = true;
+            active = false;
+            controller.abort();
             setAuthSessionHandlersSuppressed(false);
         };
-    }, [refreshUser]);
+    }, [setUser]);
 
     const value = useMemo<AuthContextValue>(
         () => ({

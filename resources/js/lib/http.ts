@@ -4,14 +4,13 @@ import type {
     NormalizedApiError,
 } from '@/types/http';
 import axios, {
-    type AxiosError,
+    AxiosError,
     type AxiosInstance,
     type InternalAxiosRequestConfig,
 } from 'axios';
 
 type AuthSessionHandlers = {
     onUnauthenticated?: () => void;
-    onPasswordConfirmationRequired?: () => void;
 };
 
 type RequestConfigWithAuthMeta = InternalAxiosRequestConfig & {
@@ -87,6 +86,19 @@ export function isNormalizedApiError(
         'message' in error &&
         'errors' in error
     );
+}
+
+/** True when a request was aborted via AbortController / Axios cancel. */
+export function isRequestAborted(error: unknown): boolean {
+    if (axios.isCancel(error)) {
+        return true;
+    }
+
+    if (axios.isAxiosError(error) && error.code === AxiosError.ERR_CANCELED) {
+        return true;
+    }
+
+    return error instanceof DOMException && error.name === 'AbortError';
 }
 
 export function normalizeApiError(error: unknown): NormalizedApiError {
@@ -238,10 +250,6 @@ http.interceptors.response.use(
 
             if (status === 401) {
                 authSessionHandlers.onUnauthenticated?.();
-            }
-
-            if (status === 423) {
-                authSessionHandlers.onPasswordConfirmationRequired?.();
             }
         }
 

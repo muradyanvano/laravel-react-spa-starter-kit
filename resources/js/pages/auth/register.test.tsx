@@ -80,6 +80,17 @@ describe('Register page', () => {
         expect(
             await screen.findByText('The email has already been taken.'),
         ).toBeInTheDocument();
+        expect(screen.getByLabelText('Email address')).toHaveAttribute(
+            'aria-invalid',
+            'true',
+        );
+        expect(screen.getByLabelText('Email address')).toHaveAttribute(
+            'aria-describedby',
+            'email-error',
+        );
+        expect(
+            screen.getByText('The email has already been taken.'),
+        ).toHaveAttribute('id', 'email-error');
     });
 
     it('redirects to verify-email after registration when unverified', async () => {
