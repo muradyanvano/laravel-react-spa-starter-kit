@@ -3,9 +3,9 @@
 A community Laravel starter kit for a first-party React SPA using React Router instead of Inertia.js.
 
 [![CI](https://img.shields.io/github/actions/workflow/status/muradyanvano/laravel-react-spa-starter-kit/tests.yml?branch=main&label=CI)](https://github.com/muradyanvano/laravel-react-spa-starter-kit/actions/workflows/tests.yml)
-[![Packagist Version](https://img.shields.io/packagist/v/muradyanvano1995/laravel-react-spa-starter-kit)](https://packagist.org/packages/muradyanvano1995/laravel-react-spa-starter-kit)
-[![Packagist Downloads](https://img.shields.io/packagist/dt/muradyanvano1995/laravel-react-spa-starter-kit)](https://packagist.org/packages/muradyanvano1995/laravel-react-spa-starter-kit)
-[![PHP Version](https://img.shields.io/packagist/php-v/muradyanvano1995/laravel-react-spa-starter-kit)](https://packagist.org/packages/muradyanvano1995/laravel-react-spa-starter-kit)
+[![Packagist Version](https://img.shields.io/packagist/v/muradyanvano/laravel-react-spa-starter-kit)](https://packagist.org/packages/muradyanvano/laravel-react-spa-starter-kit)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/muradyanvano/laravel-react-spa-starter-kit)](https://packagist.org/packages/muradyanvano/laravel-react-spa-starter-kit)
+[![PHP Version](https://img.shields.io/packagist/php-v/muradyanvano/laravel-react-spa-starter-kit)](https://packagist.org/packages/muradyanvano/laravel-react-spa-starter-kit)
 [![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 [![License](https://img.shields.io/github/license/muradyanvano/laravel-react-spa-starter-kit)](LICENSE)
 
@@ -39,7 +39,7 @@ UI and developer experience are inspired by Laravel’s official React starter k
 ### Laravel Installer
 
 ```bash
-laravel new my-app --using=muradyanvano1995/laravel-react-spa-starter-kit
+laravel new my-app --using=muradyanvano/laravel-react-spa-starter-kit
 cd my-app
 npm run dev
 ```
@@ -50,7 +50,7 @@ The Laravel Installer may currently resolve `dev-main` for community `--using` k
 
 ```bash
 composer create-project \
-  muradyanvano1995/laravel-react-spa-starter-kit \
+  muradyanvano/laravel-react-spa-starter-kit \
   my-app \
   v1.0.0
 
@@ -217,7 +217,7 @@ This community project is independent of Laravel and is **not** an official star
 ## Links
 
 - [GitHub repository](https://github.com/muradyanvano/laravel-react-spa-starter-kit)
-- [Packagist package](https://packagist.org/packages/muradyanvano1995/laravel-react-spa-starter-kit)
+- [Packagist package](https://packagist.org/packages/muradyanvano/laravel-react-spa-starter-kit)
 - [Contributing](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 - [License](LICENSE)
