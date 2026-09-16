@@ -6,6 +6,16 @@ import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
+/*
+ * Vitest (vp test) resolves this Vite config with a non-build command so it can
+ * transform modules. laravel-vite-plugin treats that like the HMR server and
+ * refuses to start when CI=true. Production `vp build` uses command "build" and
+ * is already allowed. Scope the documented bypass to Vitest only.
+ */
+if (process.env.VITEST) {
+    process.env.LARAVEL_BYPASS_ENV_CHECK ??= '1';
+}
+
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
