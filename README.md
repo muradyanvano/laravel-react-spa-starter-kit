@@ -9,6 +9,14 @@ A community Laravel starter kit for a first-party React SPA using React Router i
 [![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 [![License](https://img.shields.io/github/license/muradyanvano1995/laravel-react-spa-starter-kit)](LICENSE)
 
+<p align="center">
+  <img
+    src=".github/assets/social-preview.png"
+    alt="Laravel React SPA Starter Kit"
+    width="100%"
+  >
+</p>
+
 This is **not** an official Laravel starter kit and is not endorsed by Laravel.
 
 ## Why this starter kit
@@ -210,6 +218,10 @@ This community project is independent of Laravel and is **not** an official star
 
 - [GitHub repository](https://github.com/muradyanvano1995/laravel-react-spa-starter-kit)
 - [Packagist package](https://packagist.org/packages/muradyanvano1995/laravel-react-spa-starter-kit)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [License](LICENSE)
+- [Notice](NOTICE.md)
 - [Laravel documentation](https://laravel.com/docs)
 - [React documentation](https://react.dev)
 - [React Router documentation](https://reactrouter.com)
