@@ -26,7 +26,7 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/muradyanvano1995/laravel-react-spa-starter-kit',
+        href: 'https://github.com/muradyanvano/laravel-react-spa-starter-kit',
         icon: FolderGit2,
     },
     {

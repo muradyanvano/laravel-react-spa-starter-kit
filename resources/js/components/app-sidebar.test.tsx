@@ -30,7 +30,7 @@ describe('AppSidebar repository link', () => {
             await screen.findByRole('link', { name: /Repository/i }),
         ).toHaveAttribute(
             'href',
-            'https://github.com/muradyanvano1995/laravel-react-spa-starter-kit',
+            'https://github.com/muradyanvano/laravel-react-spa-starter-kit',
         );
     });
 });

@@ -14,10 +14,10 @@
         "typescript"
     ],
     "license": "MIT",
-    "homepage": "https://github.com/muradyanvano1995/laravel-react-spa-starter-kit",
+    "homepage": "https://github.com/muradyanvano/laravel-react-spa-starter-kit",
     "support": {
-        "issues": "https://github.com/muradyanvano1995/laravel-react-spa-starter-kit/issues",
-        "source": "https://github.com/muradyanvano1995/laravel-react-spa-starter-kit"
+        "issues": "https://github.com/muradyanvano/laravel-react-spa-starter-kit/issues",
+        "source": "https://github.com/muradyanvano/laravel-react-spa-starter-kit"
     },
     "require": {
         "php": "^8.3",

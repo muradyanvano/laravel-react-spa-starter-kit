@@ -19,7 +19,7 @@ If private vulnerability reporting is enabled for this repository, use GitHub’
 Repository → **Security** → **Report a vulnerability**
 
 Direct link (when enabled):
-https://github.com/muradyanvano1995/laravel-react-spa-starter-kit/security/advisories/new
+https://github.com/muradyanvano/laravel-react-spa-starter-kit/security/advisories/new
 
 If that option is unavailable, open a private security advisory request through the repository Security tab, or contact the maintainers through a non-public channel they publish for security reports.
 
