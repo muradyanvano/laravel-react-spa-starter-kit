@@ -135,6 +135,8 @@ cd laravel-react-spa-starter-kit
 composer run setup
 ```
 
+Laravel Boost is included as an optional dev dependency for AI-assisted coding. Generated Boost state (`boost.json`, agent guideline files) is gitignored and is **not** shipped to Packagist consumers. After creating an app, run `php artisan boost:install` locally if you want Boost guidelines/skills. The Laravel installer may also offer Boost during `laravel new`.
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
