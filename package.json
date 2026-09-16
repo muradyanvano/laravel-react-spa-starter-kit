@@ -4,24 +4,25 @@
     "type": "module",
     "scripts": {
         "build": "vp build",
-        "build:ssr": "vp build && vp build --ssr",
         "dev": "vp dev",
         "check": "vp check",
         "check:fix": "vp check --fix",
-        "types:check": "tsc --noEmit"
+        "types:check": "tsc --noEmit",
+        "test": "vp test",
+        "test:watch": "vp test --watch"
     },
     "dependencies": {
-        "@inertiajs/react": "^3.0.0",
-        "@inertiajs/vite": "^3.0.0",
         "@tailwindcss/vite": "^4.1.11",
         "@types/react": "^19.2.0",
         "@types/react-dom": "^19.2.0",
         "@vitejs/plugin-react": "^6.1.1",
+        "axios": "^1.20.0",
         "clsx": "^2.1.1",
         "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^3.1",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
+        "react-router": "^8.4.0",
         "tailwind-merge": "^3.0.1",
         "tailwindcss": "^4.0.0",
         "typescript": "^5.7.2",
@@ -30,8 +31,12 @@
     "devDependencies": {
         "@laravel/vite-plugin-wayfinder": "^0.1.3",
         "@rolldown/plugin-babel": "^0.2.3",
+        "@testing-library/jest-dom": "^7.0.1",
+        "@testing-library/react": "^16.3.3",
+        "@testing-library/user-event": "^14.6.7",
         "@types/node": "^22.13.5",
         "babel-plugin-react-compiler": "^1.0.0",
+        "jsdom": "^29.1.1",
         "vite-plus": "0.3.0"
     },
     "optionalDependencies": {

@@ -1,17 +1,21 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/blank-react-starter-kit",
+    "name": "muradyanvano1995/laravel-react-spa-starter-kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A community-maintained Laravel React SPA starter kit (no Inertia) using Fortify, Sanctum, React Router, and Vite.",
     "keywords": [
         "laravel",
-        "framework"
+        "react",
+        "spa",
+        "sanctum",
+        "fortify"
     ],
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/fortify": "^1.39",
         "laravel/framework": "^13.17",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14"
     },
@@ -63,6 +67,7 @@
             "Composer\\Config::disableProcessTimeout",
             "npm run check",
             "npm run types:check",
+            "npm run test",
             "@test"
         ],
         "types:check": [

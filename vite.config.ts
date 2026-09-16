@@ -1,4 +1,3 @@
-import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
@@ -18,7 +17,6 @@ export default defineConfig({
                 }),
             ],
         }),
-        inertia(),
         react(),
         babel({
             presets: [reactCompilerPreset()],
@@ -28,6 +26,11 @@ export default defineConfig({
             formVariants: true,
         }),
     ]),
+    test: {
+        environment: 'jsdom',
+        setupFiles: ['resources/js/testing/setup.ts'],
+        include: ['resources/js/**/*.{test,spec}.{ts,tsx}'],
+    },
     server: {
         watch: {
             ignored: [
@@ -44,10 +47,8 @@ export default defineConfig({
             'vendor/**',
             'node_modules/**',
             'public/**',
-            'bootstrap/ssr/**',
-            'tailwind.config.js',
-            'resources/js/actions/**',
             'resources/js/components/ui/*',
+            'resources/js/actions/**',
             'resources/js/routes/**',
             'resources/js/wayfinder/**',
         ],
