@@ -16,6 +16,21 @@ if (process.env.VITEST) {
     process.env.LARAVEL_BYPASS_ENV_CHECK ??= '1';
 }
 
+/**
+ * Node.js 25+ exposes a global `localStorage` without a usable Storage API unless
+ * `--localstorage-file` points at a real file. Vitest/jsdom then skip installing
+ * their own implementation, so `localStorage.clear` is not a function. Disable
+ * Node's incomplete Web Storage for the test worker so jsdom can own localStorage.
+ */
+function vitestNodeExecArgv(): string[] {
+    const major = Number.parseInt(
+        process.versions.node.split('.')[0] ?? '0',
+        10,
+    );
+
+    return major >= 25 ? ['--no-webstorage'] : [];
+}
+
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
@@ -38,6 +53,7 @@ export default defineConfig({
     ]),
     test: {
         environment: 'jsdom',
+        execArgv: vitestNodeExecArgv(),
         setupFiles: ['resources/js/testing/setup.ts'],
         include: ['resources/js/**/*.{test,spec}.{ts,tsx}'],
     },
