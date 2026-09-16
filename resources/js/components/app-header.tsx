@@ -50,7 +50,7 @@ const mainNavItems: NavItem[] = [
 const rightNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/muradyanvano1995/laravel-react-spa-starter-kit',
+        href: 'https://github.com/laravel/react-starter-kit',
         icon: Folder,
     },
     {

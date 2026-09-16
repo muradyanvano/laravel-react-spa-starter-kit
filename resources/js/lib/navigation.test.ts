@@ -15,6 +15,9 @@ describe('getSafeInternalPath', () => {
         expect(getSafeInternalPath('https://evil.test')).toBe('/dashboard');
         expect(getSafeInternalPath('//evil.test')).toBe('/dashboard');
         expect(getSafeInternalPath('\\evil')).toBe('/dashboard');
+        expect(getSafeInternalPath('javascript:alert(1)')).toBe('/dashboard');
+        expect(getSafeInternalPath('http://evil.test/path')).toBe('/dashboard');
         expect(getSafeInternalPath(null)).toBe('/dashboard');
+        expect(getSafeInternalPath('')).toBe('/dashboard');
     });
 });

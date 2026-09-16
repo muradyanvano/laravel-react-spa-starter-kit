@@ -68,6 +68,12 @@ describe('normalizeApiError', () => {
         expect(normalizeApiError(axiosErrorFrom(419, {})).kind).toBe('csrf');
     });
 
+    it('normalizes password confirmation required responses', () => {
+        expect(normalizeApiError(axiosErrorFrom(423, {})).kind).toBe(
+            'password_confirmation',
+        );
+    });
+
     it('normalizes throttled responses', () => {
         expect(normalizeApiError(axiosErrorFrom(429, {})).kind).toBe(
             'throttled',

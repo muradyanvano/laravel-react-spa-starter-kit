@@ -46,3 +46,12 @@ test('confirmed password status endpoint reports confirmation state', function (
         ->assertOk()
         ->assertJson(['confirmed' => true]);
 });
+
+test('password confirmed middleware returns 423 when confirmation has expired', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->withSession(['auth.password_confirmed_at' => now()->subYear()->getTimestamp()])
+        ->postJson('/user/two-factor-authentication')
+        ->assertStatus(423);
+});

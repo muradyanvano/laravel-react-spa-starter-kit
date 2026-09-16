@@ -5,7 +5,36 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+
+test('verification notice named route exists and serves the spa shell', function () {
+    expect(Route::has('verification.notice'))->toBeTrue();
+
+    $user = User::factory()->unverified()->create();
+
+    $this->actingAs($user)
+        ->get(route('verification.notice'))
+        ->assertOk()
+        ->assertViewIs('app');
+});
+
+test('verified middleware redirects browser requests to verification notice', function () {
+    $user = User::factory()->unverified()->create();
+
+    $this->actingAs($user)
+        ->withHeaders(['Accept' => 'text/html'])
+        ->get('/api/v1/settings/security')
+        ->assertRedirect(route('verification.notice'));
+});
+
+test('verified middleware keeps json unauthorized semantics for api requests', function () {
+    $user = User::factory()->unverified()->create();
+
+    $this->actingAs($user)
+        ->getJson('/api/v1/settings/security')
+        ->assertForbidden();
+});
 
 test('email verification notice spa page is available to authenticated users', function () {
     $user = User::factory()->unverified()->create();

@@ -3,7 +3,41 @@ import type {
     LaravelValidationErrors,
     NormalizedApiError,
 } from '@/types/http';
-import axios, { type AxiosError, type AxiosInstance } from 'axios';
+import axios, {
+    type AxiosError,
+    type AxiosInstance,
+    type InternalAxiosRequestConfig,
+} from 'axios';
+
+type AuthSessionHandlers = {
+    onUnauthenticated?: () => void;
+    onPasswordConfirmationRequired?: () => void;
+};
+
+type RequestConfigWithAuthMeta = InternalAxiosRequestConfig & {
+    skipAuthSessionHandlers?: boolean;
+};
+
+let authSessionHandlers: AuthSessionHandlers = {};
+let authSessionHandlersSuppressed = false;
+
+/**
+ * Register SPA reactions for session-level auth HTTP statuses.
+ * Keep this thin — navigation belongs to React Router owners.
+ */
+export function configureAuthSessionHandlers(
+    handlers: AuthSessionHandlers,
+): void {
+    authSessionHandlers = handlers;
+}
+
+/**
+ * Suppress session handlers during AuthProvider bootstrap so a normal
+ * guest 401 from /api/v1/user does not trigger login redirects.
+ */
+export function setAuthSessionHandlersSuppressed(suppressed: boolean): void {
+    authSessionHandlersSuppressed = suppressed;
+}
 
 function isLaravelValidationBody(
     data: unknown,
@@ -133,6 +167,18 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
         };
     }
 
+    if (status === 423) {
+        return {
+            kind: 'password_confirmation',
+            status,
+            message: messageFromBody(
+                data,
+                'Please confirm your password before continuing.',
+            ),
+            errors: {},
+        };
+    }
+
     if (status === 429) {
         return {
             kind: 'throttled',
@@ -162,6 +208,12 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
     };
 }
 
+function shouldSkipAuthSessionHandlers(error: AxiosError): boolean {
+    const config = error.config as RequestConfigWithAuthMeta | undefined;
+
+    return Boolean(config?.skipAuthSessionHandlers);
+}
+
 export const http: AxiosInstance = axios.create({
     baseURL: '/',
     headers: {
@@ -173,6 +225,29 @@ export const http: AxiosInstance = axios.create({
     xsrfCookieName: 'XSRF-TOKEN',
     xsrfHeaderName: 'X-XSRF-TOKEN',
 });
+
+http.interceptors.response.use(
+    (response) => response,
+    (error: unknown) => {
+        if (
+            axios.isAxiosError(error) &&
+            !authSessionHandlersSuppressed &&
+            !shouldSkipAuthSessionHandlers(error)
+        ) {
+            const status = error.response?.status;
+
+            if (status === 401) {
+                authSessionHandlers.onUnauthenticated?.();
+            }
+
+            if (status === 423) {
+                authSessionHandlers.onPasswordConfirmationRequired?.();
+            }
+        }
+
+        return Promise.reject(error);
+    },
+);
 
 /**
  * Initialize CSRF cookie protection before state-changing auth requests.

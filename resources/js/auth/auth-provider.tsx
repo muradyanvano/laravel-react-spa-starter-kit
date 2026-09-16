@@ -1,3 +1,4 @@
+import { setAuthSessionHandlersSuppressed } from '@/lib/http';
 import { fetchCurrentUser, logout as logoutRequest } from '@/lib/auth-api';
 import type { User } from '@/types/auth';
 import {
@@ -56,7 +57,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [setUser]);
 
     useEffect(() => {
-        void refreshUser();
+        let cancelled = false;
+
+        setAuthSessionHandlersSuppressed(true);
+
+        void refreshUser().finally(() => {
+            if (!cancelled) {
+                setAuthSessionHandlersSuppressed(false);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+            setAuthSessionHandlersSuppressed(false);
+        };
     }, [refreshUser]);
 
     const value = useMemo<AuthContextValue>(

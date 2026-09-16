@@ -1,6 +1,7 @@
+import { AuthSessionBridge } from '@/auth/auth-session-bridge';
 import { GuestRoute, ProtectedRoute, VerifiedRoute } from '@/router/guards';
 import { lazy, Suspense, type ReactNode } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 
 const WelcomePage = lazy(() => import('@/pages/welcome'));
 const DashboardPage = lazy(() => import('@/pages/dashboard'));
@@ -34,141 +35,161 @@ function LazyPage({ children }: { children: ReactNode }) {
     );
 }
 
+function RootLayout() {
+    return (
+        <>
+            <AuthSessionBridge />
+            <Outlet />
+        </>
+    );
+}
+
 export const router = createBrowserRouter([
     {
-        path: '/',
-        element: (
-            <LazyPage>
-                <WelcomePage />
-            </LazyPage>
-        ),
-    },
-    {
-        element: <GuestRoute />,
+        element: <RootLayout />,
         children: [
             {
-                path: '/login',
+                path: '/',
                 element: (
                     <LazyPage>
-                        <LoginPage />
+                        <WelcomePage />
                     </LazyPage>
                 ),
             },
             {
-                path: '/register',
-                element: (
-                    <LazyPage>
-                        <RegisterPage />
-                    </LazyPage>
-                ),
-            },
-            {
-                path: '/forgot-password',
-                element: (
-                    <LazyPage>
-                        <ForgotPasswordPage />
-                    </LazyPage>
-                ),
-            },
-            {
-                path: '/reset-password/:token',
-                element: (
-                    <LazyPage>
-                        <ResetPasswordPage />
-                    </LazyPage>
-                ),
-            },
-            {
-                path: '/two-factor-challenge',
-                element: (
-                    <LazyPage>
-                        <TwoFactorChallengePage />
-                    </LazyPage>
-                ),
-            },
-        ],
-    },
-    {
-        element: <ProtectedRoute />,
-        children: [
-            {
-                path: '/verify-email',
-                element: (
-                    <LazyPage>
-                        <VerifyEmailPage />
-                    </LazyPage>
-                ),
-            },
-            {
-                path: '/confirm-password',
-                element: (
-                    <LazyPage>
-                        <ConfirmPasswordPage />
-                    </LazyPage>
-                ),
-            },
-        ],
-    },
-    {
-        element: <VerifiedRoute />,
-        children: [
-            {
-                path: '/dashboard',
-                element: (
-                    <LazyPage>
-                        <DashboardPage />
-                    </LazyPage>
-                ),
-            },
-            {
-                path: '/settings',
+                element: <GuestRoute />,
                 children: [
                     {
-                        index: true,
-                        element: <Navigate to="/settings/profile" replace />,
-                    },
-                    {
-                        path: 'profile',
+                        path: '/login',
                         element: (
                             <LazyPage>
-                                <ProfileSettingsPage />
+                                <LoginPage />
                             </LazyPage>
                         ),
                     },
                     {
-                        path: 'security',
+                        path: '/register',
                         element: (
                             <LazyPage>
-                                <SecuritySettingsPage />
+                                <RegisterPage />
                             </LazyPage>
                         ),
                     },
                     {
-                        path: 'appearance',
+                        path: '/forgot-password',
                         element: (
                             <LazyPage>
-                                <AppearanceSettingsPage />
+                                <ForgotPasswordPage />
                             </LazyPage>
                         ),
                     },
                     {
-                        path: 'password',
-                        element: <Navigate to="/settings/security" replace />,
+                        path: '/reset-password/:token',
+                        element: (
+                            <LazyPage>
+                                <ResetPasswordPage />
+                            </LazyPage>
+                        ),
                     },
                     {
-                        path: 'two-factor',
-                        element: <Navigate to="/settings/security" replace />,
+                        path: '/two-factor-challenge',
+                        element: (
+                            <LazyPage>
+                                <TwoFactorChallengePage />
+                            </LazyPage>
+                        ),
                     },
                 ],
             },
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        path: '/verify-email',
+                        element: (
+                            <LazyPage>
+                                <VerifyEmailPage />
+                            </LazyPage>
+                        ),
+                    },
+                    {
+                        path: '/confirm-password',
+                        element: (
+                            <LazyPage>
+                                <ConfirmPasswordPage />
+                            </LazyPage>
+                        ),
+                    },
+                ],
+            },
+            {
+                element: <VerifiedRoute />,
+                children: [
+                    {
+                        path: '/dashboard',
+                        element: (
+                            <LazyPage>
+                                <DashboardPage />
+                            </LazyPage>
+                        ),
+                    },
+                    {
+                        path: '/settings',
+                        children: [
+                            {
+                                index: true,
+                                element: (
+                                    <Navigate to="/settings/profile" replace />
+                                ),
+                            },
+                            {
+                                path: 'profile',
+                                element: (
+                                    <LazyPage>
+                                        <ProfileSettingsPage />
+                                    </LazyPage>
+                                ),
+                            },
+                            {
+                                path: 'security',
+                                element: (
+                                    <LazyPage>
+                                        <SecuritySettingsPage />
+                                    </LazyPage>
+                                ),
+                            },
+                            {
+                                path: 'appearance',
+                                element: (
+                                    <LazyPage>
+                                        <AppearanceSettingsPage />
+                                    </LazyPage>
+                                ),
+                            },
+                            {
+                                path: 'password',
+                                element: (
+                                    <Navigate to="/settings/security" replace />
+                                ),
+                            },
+                            {
+                                path: 'two-factor',
+                                element: (
+                                    <Navigate to="/settings/security" replace />
+                                ),
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                path: '*',
+                element: (
+                    <LazyPage>
+                        <NotFoundPage />
+                    </LazyPage>
+                ),
+            },
         ],
-    },
-    {
-        path: '*',
-        element: (
-            <LazyPage>
-                <NotFoundPage />
-            </LazyPage>
-        ),
     },
 ]);

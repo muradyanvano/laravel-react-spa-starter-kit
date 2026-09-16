@@ -38,10 +38,9 @@ test('two-factor challenge spa shell is available during challenge', function ()
         ->assertViewIs('app');
 });
 
-test('two-factor challenge spa shell is available to guests', function () {
+test('two-factor challenge redirects to login without a pending challenge', function () {
     $this->get(route('two-factor.login'))
-        ->assertOk()
-        ->assertViewIs('app');
+        ->assertRedirect(route('login'));
 });
 
 test('invalid authenticator codes are rejected', function () {

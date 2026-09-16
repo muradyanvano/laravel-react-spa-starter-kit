@@ -14,11 +14,11 @@ export type ApiErrorKind =
     | 'forbidden'
     | 'not_found'
     | 'csrf'
+    | 'password_confirmation'
     | 'throttled'
     | 'server'
     | 'network'
     | 'unknown';
-
 export type NormalizedApiError = {
     kind: ApiErrorKind;
     status: number | null;

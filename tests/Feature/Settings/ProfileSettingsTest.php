@@ -85,14 +85,16 @@ test('guests cannot delete an account', function () {
     ])->assertUnauthorized();
 });
 
-test('unverified users cannot delete their account', function () {
+test('unverified users can delete their own account', function () {
     $user = User::factory()->unverified()->create([
         'password' => Hash::make('password'),
     ]);
 
-    $this->actingAs($user)
-        ->deleteJson('/settings/profile', [
-            'password' => 'password',
-        ])
-        ->assertForbidden();
+    $response = $this->actingAs($user)->deleteJson('/settings/profile', [
+        'password' => 'password',
+    ]);
+
+    $response->assertNoContent();
+    $this->assertGuest();
+    expect($user->fresh())->toBeNull();
 });
