@@ -91,15 +91,15 @@ Passkey UI is not included in this release (Fortify’s passkeys package may sti
 
 ## Architecture
 
-| Concern | This kit |
-| --- | --- |
-| Browser routing | React Router |
-| Auth capabilities | Laravel Fortify |
-| SPA session auth | Sanctum stateful cookies + CSRF |
-| HTTP client | Axios |
-| Typed routes / actions | Laravel Wayfinder |
-| Page shell | Blade SPA shell + React |
-| Inertia | Not used |
+| Concern                | This kit                        |
+| ---------------------- | ------------------------------- |
+| Browser routing        | React Router                    |
+| Auth capabilities      | Laravel Fortify                 |
+| SPA session auth       | Sanctum stateful cookies + CSRF |
+| HTTP client            | Axios                           |
+| Typed routes / actions | Laravel Wayfinder               |
+| Page shell             | Blade SPA shell + React         |
+| Inertia                | Not used                        |
 
 **Laravel** owns the API/backend, Fortify endpoints, Sanctum session authentication, and the SPA shell/fallback.
 
