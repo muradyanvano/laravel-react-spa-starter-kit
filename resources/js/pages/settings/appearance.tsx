@@ -1,13 +1,30 @@
+import AppearanceTabs from '@/components/appearance-tabs';
+import { DocumentTitle } from '@/components/document-title';
+import Heading from '@/components/heading';
 import { SettingsLayout } from '@/layouts/settings-layout';
+import type { BreadcrumbItem } from '@/types';
 
-export default function AppearanceSettingsPage() {
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Appearance settings',
+        href: '/settings/appearance',
+    },
+];
+
+export default function Appearance() {
     return (
-        <SettingsLayout title="Appearance settings">
-            <div className="space-y-2">
-                <h1 className="text-2xl font-medium">Appearance</h1>
-                <p className="text-[#706f6c] dark:text-[#A1A09A]">
-                    Appearance settings UI is planned for a later phase.
-                </p>
+        <SettingsLayout breadcrumbs={breadcrumbs}>
+            <DocumentTitle title="Appearance settings" />
+
+            <h1 className="sr-only">Appearance settings</h1>
+
+            <div className="space-y-6">
+                <Heading
+                    variant="small"
+                    title="Appearance settings"
+                    description="Update the appearance settings for your account"
+                />
+                <AppearanceTabs />
             </div>
         </SettingsLayout>
     );

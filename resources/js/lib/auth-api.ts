@@ -18,6 +18,11 @@ type StatusResponse = {
     message?: string;
 };
 
+/** Fortify answers with `{ two_factor: true }` when a challenge is required. */
+export type LoginResult = {
+    two_factor: boolean;
+};
+
 export async function fetchCurrentUser(): Promise<User | null> {
     try {
         const response = await http.get<UserResponse>('/api/v1/user');
@@ -36,13 +41,16 @@ export async function login(credentials: {
     email: string;
     password: string;
     remember: boolean;
-}): Promise<void> {
+}): Promise<LoginResult> {
     await ensureCsrfCookie();
-    await http.post('/login', {
+
+    const response = await http.post<Partial<LoginResult>>('/login', {
         email: credentials.email,
         password: credentials.password,
         remember: credentials.remember,
     });
+
+    return { two_factor: response.data?.two_factor === true };
 }
 
 export async function register(payload: {

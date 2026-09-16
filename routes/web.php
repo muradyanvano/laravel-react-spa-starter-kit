@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\SpaController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,19 @@ Route::get('/login', SpaController::class)->name('login');
 
 Route::get('/reset-password/{token}', SpaController::class)
     ->name('password.reset');
+
+Route::get('/confirm-password', SpaController::class)
+    ->middleware('auth')
+    ->name('password.confirm');
+
+Route::get('/two-factor-challenge', SpaController::class)
+    ->middleware('guest')
+    ->name('two-factor.login');
+
+Route::middleware(['auth', 'verified'])->group(function (): void {
+    Route::delete('/settings/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+});
 
 /*
 |--------------------------------------------------------------------------

@@ -48,11 +48,20 @@ export default function Login() {
                     event.preventDefault();
                     void form
                         .submit(async (data) => {
-                            await loginRequest({
+                            const result = await loginRequest({
                                 email: data.email,
                                 password: data.password,
                                 remember: data.remember,
                             });
+
+                            if (result.two_factor) {
+                                await navigate('/two-factor-challenge', {
+                                    replace: true,
+                                    state: { from: intended },
+                                });
+
+                                return;
+                            }
 
                             const user = await refreshUser();
 

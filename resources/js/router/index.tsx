@@ -9,12 +9,15 @@ const RegisterPage = lazy(() => import('@/pages/auth/register'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/forgot-password'));
 const ResetPasswordPage = lazy(() => import('@/pages/auth/reset-password'));
 const VerifyEmailPage = lazy(() => import('@/pages/auth/verify-email'));
+const ConfirmPasswordPage = lazy(() => import('@/pages/auth/confirm-password'));
+const TwoFactorChallengePage = lazy(
+    () => import('@/pages/auth/two-factor-challenge'),
+);
 const ProfileSettingsPage = lazy(() => import('@/pages/settings/profile'));
-const PasswordSettingsPage = lazy(() => import('@/pages/settings/password'));
+const SecuritySettingsPage = lazy(() => import('@/pages/settings/security'));
 const AppearanceSettingsPage = lazy(
     () => import('@/pages/settings/appearance'),
 );
-const TwoFactorSettingsPage = lazy(() => import('@/pages/settings/two-factor'));
 const NotFoundPage = lazy(() => import('@/pages/not-found'));
 
 function LazyPage({ children }: { children: ReactNode }) {
@@ -75,6 +78,14 @@ export const router = createBrowserRouter([
                     </LazyPage>
                 ),
             },
+            {
+                path: '/two-factor-challenge',
+                element: (
+                    <LazyPage>
+                        <TwoFactorChallengePage />
+                    </LazyPage>
+                ),
+            },
         ],
     },
     {
@@ -85,6 +96,14 @@ export const router = createBrowserRouter([
                 element: (
                     <LazyPage>
                         <VerifyEmailPage />
+                    </LazyPage>
+                ),
+            },
+            {
+                path: '/confirm-password',
+                element: (
+                    <LazyPage>
+                        <ConfirmPasswordPage />
                     </LazyPage>
                 ),
             },
@@ -117,10 +136,10 @@ export const router = createBrowserRouter([
                         ),
                     },
                     {
-                        path: 'password',
+                        path: 'security',
                         element: (
                             <LazyPage>
-                                <PasswordSettingsPage />
+                                <SecuritySettingsPage />
                             </LazyPage>
                         ),
                     },
@@ -133,12 +152,12 @@ export const router = createBrowserRouter([
                         ),
                     },
                     {
+                        path: 'password',
+                        element: <Navigate to="/settings/security" replace />,
+                    },
+                    {
                         path: 'two-factor',
-                        element: (
-                            <LazyPage>
-                                <TwoFactorSettingsPage />
-                            </LazyPage>
-                        ),
+                        element: <Navigate to="/settings/security" replace />,
                     },
                 ],
             },

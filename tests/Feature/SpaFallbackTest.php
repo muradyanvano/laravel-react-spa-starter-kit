@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 test('serves the spa shell for the home route', function () {
     $response = $this->get('/');
 
@@ -21,10 +23,33 @@ test('serves the spa shell for frontend routes on direct refresh', function (str
     '/reset-password/example-token',
     '/verify-email',
     '/settings/profile',
-    '/settings/password',
+    '/settings/security',
     '/settings/appearance',
+    '/settings/password',
     '/settings/two-factor',
 ]);
+
+test('serves confirm-password spa shell for authenticated users', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get('/confirm-password')
+        ->assertOk()
+        ->assertViewIs('app');
+});
+
+test('serves two-factor-challenge spa shell for guests with pending login', function () {
+    $user = User::factory()->withTwoFactor()->create();
+
+    $this->postJson('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ])->assertOk();
+
+    $this->get('/two-factor-challenge')
+        ->assertOk()
+        ->assertViewIs('app');
+});
 
 test('does not swallow api routes with the spa fallback', function () {
     $response = $this->getJson('/api/v1/user');

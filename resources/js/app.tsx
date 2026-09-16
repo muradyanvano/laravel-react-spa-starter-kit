@@ -1,4 +1,6 @@
 import { AuthProvider } from '@/auth/auth-provider';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { router } from '@/router';
 import { StrictMode } from 'react';
@@ -15,8 +17,11 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
     <StrictMode>
-        <AuthProvider>
-            <RouterProvider router={router} />
-        </AuthProvider>
+        <TooltipProvider>
+            <AuthProvider>
+                <RouterProvider router={router} />
+                <Toaster />
+            </AuthProvider>
+        </TooltipProvider>
     </StrictMode>,
 );

@@ -99,7 +99,7 @@ describe('Login page', () => {
 
     it('navigates to the dashboard after successful login', async () => {
         const user = userEvent.setup();
-        mockedLogin.mockResolvedValue(undefined);
+        mockedLogin.mockResolvedValue({ two_factor: false });
         mockedFetchCurrentUser
             .mockResolvedValueOnce(null)
             .mockResolvedValueOnce({
@@ -129,7 +129,7 @@ describe('Login page', () => {
         mockedLogin.mockImplementation(
             () =>
                 new Promise((resolve) => {
-                    resolveLogin = () => resolve();
+                    resolveLogin = () => resolve({ two_factor: false });
                 }),
         );
 

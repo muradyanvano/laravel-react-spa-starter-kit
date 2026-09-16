@@ -1,61 +1,36 @@
-import { useAuth } from '@/auth/auth-provider';
 import { DocumentTitle } from '@/components/document-title';
-import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router';
-import { useState } from 'react';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 
-export default function DashboardPage() {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [loggingOut, setLoggingOut] = useState(false);
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+];
 
+export default function Dashboard() {
     return (
-        <div className="bg-background text-foreground min-h-svh">
+        <AppLayout breadcrumbs={breadcrumbs}>
             <DocumentTitle title="Dashboard" />
-            <header className="border-border border-b">
-                <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
-                    <Link to="/dashboard" className="font-medium">
-                        {import.meta.env.VITE_APP_NAME || 'Laravel'}
-                    </Link>
-                    <nav
-                        aria-label="Primary"
-                        className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm"
-                    >
-                        <Link to="/dashboard" className="hover:text-foreground">
-                            Dashboard
-                        </Link>
-                        <Link
-                            to="/settings/profile"
-                            className="hover:text-foreground"
-                        >
-                            Settings
-                        </Link>
-                    </nav>
+
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
                 </div>
-            </header>
-            <main className="mx-auto max-w-5xl space-y-4 px-6 py-8">
-                <h1 className="text-2xl font-medium">Dashboard</h1>
-                <p className="text-muted-foreground">
-                    You are signed in as {user?.email}.
-                </p>
-                <Button
-                    type="button"
-                    variant="outline"
-                    disabled={loggingOut}
-                    onClick={() => {
-                        setLoggingOut(true);
-                        void logout()
-                            .then(async () => {
-                                await navigate('/login', { replace: true });
-                            })
-                            .finally(() => {
-                                setLoggingOut(false);
-                            });
-                    }}
-                >
-                    {loggingOut ? 'Logging out…' : 'Log out'}
-                </Button>
-            </main>
-        </div>
+                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min">
+                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                </div>
+            </div>
+        </AppLayout>
     );
 }

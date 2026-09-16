@@ -20,7 +20,7 @@ It is a traditional first-party React SPA backed by Laravel:
 | SPA session auth          | Shared Inertia session     | Sanctum cookie/session SPA auth  |
 | UI goal                   | Official React starter kit | Same visual/UX target            |
 
-UI feature parity with the official kit is intentional and ongoing. Authentication UI/flows are implemented in this phase. Settings and 2FA UI remain planned for later phases.
+UI feature parity with the official kit is intentional and ongoing. Authentication and the authenticated app shell / settings experience (profile, security/password/2FA, appearance) are implemented. Passkeys UI remains deferred.
 
 ## Stack
 
@@ -126,11 +126,13 @@ The catch-all **does not** swallow:
 
 ### Current API endpoints
 
-| Method | Path                   | Purpose                                       |
-| ------ | ---------------------- | --------------------------------------------- |
-| GET    | `/api/v1/user`         | Authenticated current user (SPA bootstrap)    |
-| GET    | `/sanctum/csrf-cookie` | CSRF cookie initialization                    |
-| *      | Fortify routes         | Login, logout, register, password reset, etc. |
+| Method | Path                        | Purpose                                             |
+| ------ | --------------------------- | --------------------------------------------------- |
+| GET    | `/api/v1/user`              | Authenticated current user (SPA bootstrap)          |
+| GET    | `/api/v1/settings/security` | Security settings flags (2FA state, password rules) |
+| DELETE | `/settings/profile`         | Delete account (password required; session cleared) |
+| GET    | `/sanctum/csrf-cookie`      | CSRF cookie initialization                          |
+| *      | Fortify routes              | Login, logout, profile, password, 2FA, confirm, …   |
 
 ## Directory structure (frontend)
 
@@ -155,20 +157,24 @@ resources/js/
 - Sanctum cookie/session SPA wiring
 - Fortify authentication (`views` disabled for SPA)
 - Login, registration, logout, forgot/reset password, email verification UI
+- Two-factor challenge + password confirmation pages
+- Official-style authenticated app shell (sidebar, breadcrumbs, user menu)
+- Settings: Profile, Security (password + 2FA + recovery codes), Appearance
+- Account deletion with password confirmation
+- Light / dark / system appearance with persistence and flash prevention
 - Intended-route redirects and verified-email gating
-- Official-kit-aligned auth layout + shadcn/ui form components
+- Official-kit-aligned layouts + shadcn/ui components
 - Centralized Axios HTTP layer with Laravel error normalization
 - Auth bootstrap + protected/guest/verified route infrastructure
 - Current-user JSON API with safe resource serialization
-- Backend and frontend authentication tests
+- Backend and frontend authentication/settings tests
 - Updated AI agent guidance for non-Inertia SPA work
 
 ## Planned next
 
-- Settings experience (profile, password, appearance, 2FA)
-- Full application layout/sidebar parity with the official kit
-- Passkeys UI
-- Broader end-to-end UI coverage
+- Passkeys UI (optional; Fortify dependency present, feature not enabled in default UI)
+- Broader end-to-end browser coverage
+- Additional starter polish as the official kit evolves
 
 ## Contribution / development expectations
 
@@ -177,6 +183,7 @@ resources/js/
 - Keep UI aligned with Laravel's official React starter kit
 - Add/adjust tests with architecture or behavior changes
 - Run quality gates (`composer test`, `npm run check`, `npm run test`, `npm run build`) before merging
+- Never log or persist 2FA secrets, QR payloads, or recovery codes in browser storage
 
 ## License
 
