@@ -2,15 +2,23 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "muradyanvano1995/laravel-react-spa-starter-kit",
     "type": "project",
-    "description": "A community-maintained Laravel React SPA starter kit (no Inertia) using Fortify, Sanctum, React Router, and Vite.",
+    "description": "Community Laravel React SPA starter kit (no Inertia) using React Router, Fortify, Sanctum, Wayfinder, and Vite.",
     "keywords": [
         "laravel",
         "react",
         "spa",
         "sanctum",
-        "fortify"
+        "fortify",
+        "react-router",
+        "wayfinder",
+        "typescript"
     ],
     "license": "MIT",
+    "homepage": "https://github.com/muradyanvano1995/laravel-react-spa-starter-kit",
+    "support": {
+        "issues": "https://github.com/muradyanvano1995/laravel-react-spa-starter-kit/issues",
+        "source": "https://github.com/muradyanvano1995/laravel-react-spa-starter-kit"
+    },
     "require": {
         "php": "^8.3",
         "laravel/fortify": "^1.39",
