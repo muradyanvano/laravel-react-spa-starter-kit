@@ -32,7 +32,7 @@ Pull requests should normally target **`develop`**.
 ## Development setup
 
 ```bash
-git clone https://github.com/muradyanvano1995/laravel-react-spa-starter-kit.git
+git clone https://github.com/muradyanvano/laravel-react-spa-starter-kit.git
 cd laravel-react-spa-starter-kit
 composer setup
 ```
