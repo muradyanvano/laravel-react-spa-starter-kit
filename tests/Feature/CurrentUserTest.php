@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Factories\PasskeyFactory;
 
 test('unauthenticated users cannot access the current user endpoint', function () {
     $response = $this->getJson('/api/v1/user');
@@ -42,4 +43,18 @@ test('current user resource does not expose sensitive attributes', function () {
     $response->assertJsonMissingPath('data.two_factor_recovery_codes');
     expect($response->json('data'))->not->toHaveKey('password');
     expect($response->json())->not->toHaveKey('password');
+});
+
+test('current user resource does not expose passkey data', function () {
+    $user = User::factory()->create();
+    PasskeyFactory::new()->for($user)->create();
+
+    $response = $this->actingAs($user)->getJson('/api/v1/user');
+
+    $response->assertOk();
+    $response->assertJsonMissingPath('data.passkeys');
+    $response->assertJsonMissingPath('data.credential');
+    $response->assertJsonMissingPath('data.credential_id');
+    $response->assertJsonMissingPath('data.user_handle');
+    expect(json_encode($response->json()))->not->toContain('credential_id');
 });

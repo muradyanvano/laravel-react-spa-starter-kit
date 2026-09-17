@@ -1,4 +1,6 @@
+import { PASSKEY_PASSWORD_CONFIRMATION_MESSAGE } from '@/lib/passkeys';
 import { navigateToConfirmPasswordIfRequired } from '@/lib/password-confirmation';
+import { PasskeyError } from '@laravel/passkeys';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('navigateToConfirmPasswordIfRequired', () => {
@@ -39,6 +41,22 @@ describe('navigateToConfirmPasswordIfRequired', () => {
 
         expect(handled).toBe(false);
         expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('navigates for passkey registration password confirmation errors', () => {
+        const navigate = vi.fn();
+
+        const handled = navigateToConfirmPasswordIfRequired(
+            new PasskeyError(PASSKEY_PASSWORD_CONFIRMATION_MESSAGE),
+            navigate,
+            '/settings/security',
+        );
+
+        expect(handled).toBe(true);
+        expect(navigate).toHaveBeenCalledWith('/confirm-password', {
+            replace: true,
+            state: { from: '/settings/security' },
+        });
     });
 
     it('rejects unsafe intended destinations', () => {

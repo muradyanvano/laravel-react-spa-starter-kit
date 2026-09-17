@@ -33,7 +33,10 @@ export function getPostAuthPath(
     const path = getSafeInternalPath(candidate, fallback);
     const pathname = path.split('?')[0] ?? path;
 
-    if (pathname === '/confirm-password') {
+    if (
+        pathname === '/confirm-password' ||
+        pathname === '/two-factor-challenge'
+    ) {
         return fallback;
     }
 

@@ -13,6 +13,8 @@ vi.mock('@/lib/auth-api', () => ({
 vi.mock('@/lib/settings-api', () => ({
     fetchPasswordConfirmationStatus: vi.fn(),
     fetchSecuritySettings: vi.fn(),
+    fetchPasskeys: vi.fn(),
+    deletePasskey: vi.fn(),
     updatePassword: vi.fn(),
     enableTwoFactor: vi.fn(),
     disableTwoFactor: vi.fn(),
@@ -23,6 +25,7 @@ vi.mock('@/lib/settings-api', () => ({
 
 import { fetchCurrentUser } from '@/lib/auth-api';
 import {
+    fetchPasskeys,
     fetchPasswordConfirmationStatus,
     fetchRecoveryCodes,
     fetchSecuritySettings,
@@ -33,6 +36,7 @@ const mockedFetchPasswordConfirmationStatus = vi.mocked(
     fetchPasswordConfirmationStatus,
 );
 const mockedFetchSecuritySettings = vi.mocked(fetchSecuritySettings);
+const mockedFetchPasskeys = vi.mocked(fetchPasskeys);
 const mockedFetchRecoveryCodes = vi.mocked(fetchRecoveryCodes);
 
 const verifiedUser = {
@@ -44,6 +48,7 @@ const verifiedUser = {
 
 const securitySettings = {
     canManageTwoFactor: true,
+    canManagePasskeys: true,
     twoFactorEnabled: false,
     requiresConfirmation: true,
     passwordRules: 'min:8',
@@ -75,12 +80,14 @@ describe('Security settings page', () => {
         mockedFetchCurrentUser.mockReset();
         mockedFetchPasswordConfirmationStatus.mockReset();
         mockedFetchSecuritySettings.mockReset();
+        mockedFetchPasskeys.mockReset();
         mockedFetchRecoveryCodes.mockReset();
         mockedFetchCurrentUser.mockResolvedValue(verifiedUser);
         mockedFetchPasswordConfirmationStatus.mockResolvedValue({
             confirmed: true,
         });
         mockedFetchSecuritySettings.mockResolvedValue(securitySettings);
+        mockedFetchPasskeys.mockResolvedValue([]);
     });
 
     it('shows a skeleton before password controls appear', async () => {
@@ -122,7 +129,9 @@ describe('Security settings page', () => {
 
         expect(mockedFetchPasswordConfirmationStatus).toHaveBeenCalledTimes(1);
         expect(mockedFetchSecuritySettings).toHaveBeenCalledTimes(1);
+        expect(mockedFetchPasskeys).toHaveBeenCalledTimes(1);
         expect(mockedFetchRecoveryCodes).not.toHaveBeenCalled();
+        expect(mockedFetchCurrentUser).toHaveBeenCalledTimes(1);
     });
 
     it('does not fetch recovery codes when two-factor is already enabled', async () => {
@@ -160,6 +169,45 @@ describe('Security settings page', () => {
         expect(
             screen.getByRole('button', { name: 'Enable 2FA' }),
         ).toBeInTheDocument();
+        expect(
+            await screen.findByRole('heading', { name: 'Passkeys' }),
+        ).toBeInTheDocument();
+    });
+
+    it('orders sections as password, two-factor, then passkeys', async () => {
+        renderSecurity();
+
+        expect(
+            await screen.findByLabelText('Current password'),
+        ).toBeInTheDocument();
+
+        const headings = screen
+            .getAllByRole('heading')
+            .map((heading) => heading.textContent);
+
+        expect(headings.indexOf('Update password')).toBeLessThan(
+            headings.indexOf('Two-factor authentication'),
+        );
+        expect(headings.indexOf('Two-factor authentication')).toBeLessThan(
+            headings.indexOf('Passkeys'),
+        );
+    });
+
+    it('does not fetch passkeys when capability is false', async () => {
+        mockedFetchSecuritySettings.mockResolvedValue({
+            ...securitySettings,
+            canManagePasskeys: false,
+        });
+
+        renderSecurity();
+
+        expect(
+            await screen.findByLabelText('Current password'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByRole('heading', { name: 'Passkeys' }),
+        ).not.toBeInTheDocument();
+        expect(mockedFetchPasskeys).not.toHaveBeenCalled();
     });
 
     it('redirects to confirm-password when confirmation is required', async () => {

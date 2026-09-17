@@ -28,6 +28,11 @@ describe('getPostAuthPath', () => {
         expect(getPostAuthPath('/confirm-password?x=1')).toBe('/dashboard');
     });
 
+    it('avoids resuming two-factor-challenge after login', () => {
+        expect(getPostAuthPath('/two-factor-challenge')).toBe('/dashboard');
+        expect(getPostAuthPath('/two-factor-challenge?x=1')).toBe('/dashboard');
+    });
+
     it('preserves other safe intended paths', () => {
         expect(getPostAuthPath('/settings/profile')).toBe('/settings/profile');
         expect(getPostAuthPath('/dashboard')).toBe('/dashboard');

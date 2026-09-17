@@ -18,12 +18,15 @@ import {
 import { store as twoFactorChallengeRoute } from '@/routes/two-factor/login';
 import { update as updatePasswordRoute } from '@/routes/user-password';
 import { update as updateProfileRoute } from '@/routes/user-profile-information';
+import type { Passkey } from '@/types/auth';
 
 const PROFILE_DESTROY_URL = '/settings/profile';
 const SECURITY_SETTINGS_URL = '/api/v1/settings/security';
+const PASSKEYS_LIST_URL = '/api/v1/settings/passkeys';
 
 export type SecuritySettings = {
     canManageTwoFactor: boolean;
+    canManagePasskeys: boolean;
     twoFactorEnabled: boolean;
     requiresConfirmation: boolean;
     passwordRules: string;
@@ -189,4 +192,32 @@ export async function submitTwoFactorChallenge(payload: {
 }): Promise<void> {
     await ensureCsrfCookie();
     await http.post(twoFactorChallengeRoute.url(), payload);
+}
+
+export async function fetchPasskeys(options?: {
+    signal?: AbortSignal;
+}): Promise<Passkey[]> {
+    try {
+        const response = await http.get<MaybeWrapped<Passkey[]>>(
+            PASSKEYS_LIST_URL,
+            { signal: options?.signal },
+        );
+
+        return unwrap(response.data);
+    } catch (error) {
+        if (isRequestAborted(error)) {
+            throw error;
+        }
+
+        throw normalizeApiError(error);
+    }
+}
+
+export async function deletePasskey(id: number): Promise<void> {
+    try {
+        await ensureCsrfCookie();
+        await http.delete(`/user/passkeys/${id}`);
+    } catch (error) {
+        throw normalizeApiError(error);
+    }
 }

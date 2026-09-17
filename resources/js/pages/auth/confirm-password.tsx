@@ -1,4 +1,5 @@
 import { DocumentTitle } from '@/components/document-title';
+import PasskeyVerify from '@/components/passkey-verify';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { fieldDescribedBy, fieldErrorId, useForm } from '@/hooks/use-form';
 import AuthLayout from '@/layouts/auth-layout';
 import { getSafeInternalPath } from '@/lib/navigation';
+import { passkeyConfirmRoutes } from '@/lib/passkeys';
 import { confirmPassword } from '@/lib/settings-api';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -27,6 +29,16 @@ export default function ConfirmPassword() {
             description="This is a secure area of the application. Please confirm your password before continuing."
         >
             <DocumentTitle title="Confirm password" />
+
+            <PasskeyVerify
+                routes={passkeyConfirmRoutes}
+                label="Confirm with passkey"
+                loadingLabel="Confirming..."
+                separator="Or confirm with password"
+                onSuccess={async () => {
+                    await navigate(intended, { replace: true });
+                }}
+            />
 
             <form
                 noValidate

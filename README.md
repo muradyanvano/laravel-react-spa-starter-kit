@@ -44,19 +44,23 @@ cd my-app
 npm run dev
 ```
 
-The Laravel Installer may currently resolve `dev-main` for community `--using` kits. Prefer the Composer command below when you need an immutable release.
+### Composer create-project
 
-### Version-pinned Composer install
+Install the latest stable release from Packagist:
 
 ```bash
-composer create-project \
-  muradyanvano/laravel-react-spa-starter-kit \
-  my-app \
-  v1.0.0
-
+composer create-project muradyanvano/laravel-react-spa-starter-kit my-app
 cd my-app
 npm run dev
 ```
+
+Pin a specific version when you need a reproducible install:
+
+```bash
+composer create-project muradyanvano/laravel-react-spa-starter-kit my-app v1.0.0
+```
+
+> **Note:** Passkey support ships in **v1.1.0**. The latest stable tag on Packagist is still **v1.0.0** until v1.1.0 is published.
 
 ### Requirements
 
@@ -75,7 +79,9 @@ The generated project is a normal Laravel application you own and can customize 
 - Password reset
 - Email verification
 - Password confirmation
-- Two-factor authentication
+- **Passkey sign-in** (WebAuthn)
+- **Passkey password confirmation**
+- Two-factor authentication (password login)
 - Recovery codes
 
 ### Application
@@ -83,10 +89,28 @@ The generated project is a normal Laravel application you own and can customize 
 - Responsive sidebar shell and mobile navigation
 - Dashboard
 - Profile settings (including password change and account deletion)
-- Security settings
+- Security settings (password, 2FA, **passkey management**)
 - Appearance settings (light / dark / system)
 
-Passkey UI is not included in this release (Fortify’s passkeys package may still install schema; the feature is intentionally deferred).
+### Passkeys
+
+Passkeys provide passwordless sign-in through your browser or platform authenticator (Touch ID, Windows Hello, security keys, and similar).
+
+**Sign in:** On the login page, use **Sign in with a passkey** when your browser supports WebAuthn. Password login remains available as a fallback.
+
+**Confirm sensitive actions:** On the confirm-password page, you can confirm with a passkey instead of re-entering your password when supported.
+
+**Manage passkeys:** In **Settings → Security**, you can:
+
+- view registered passkeys (name, authenticator label, created/last-used metadata)
+- add/register a new passkey
+- delete a passkey (with confirmation)
+
+Adding or deleting passkeys requires recent password or passkey confirmation when Fortify password confirmation is enabled.
+
+Passkeys depend on browser and platform WebAuthn support. Unsupported browsers can still view and delete existing passkeys, but cannot register new ones from the UI.
+
+This kit does **not** implement conditional WebAuthn autofill, passkey “remember me”, or custom credential synchronization.
 
 ### Developer experience
 
@@ -105,6 +129,7 @@ Passkey UI is not included in this release (Fortify’s passkeys package may sti
 | Auth capabilities      | Laravel Fortify                 |
 | SPA session auth       | Sanctum stateful cookies + CSRF |
 | HTTP client            | Axios                           |
+| WebAuthn ceremonies    | `@laravel/passkeys`             |
 | Typed routes / actions | Laravel Wayfinder               |
 | Page shell             | Blade SPA shell + React         |
 | Inertia                | Not used                        |
@@ -119,13 +144,20 @@ Laravel serves the Blade SPA shell for browser routes such as `/dashboard` and `
 
 Default design: Laravel and the SPA share one origin (for example `https://example.com`).
 
-- Sanctum cookie / session authentication (not JWT)
+- Sanctum cookie / session authentication (not JWT or bearer tokens in browser storage)
 - CSRF protection via `/sanctum/csrf-cookie` and `X-XSRF-TOKEN`
 - No auth tokens stored in `localStorage`
 - Session regeneration on authentication events
-- Password confirmation for sensitive actions
+- Password confirmation for sensitive actions (including passkey registration and deletion when configured)
 - Email verification
-- Two-factor authentication and recovery-code handling
+- Two-factor authentication and recovery-code handling for **password login**
+- WebAuthn passkeys through Laravel Fortify and `laravel/passkeys`
+
+**Password login and 2FA:** When two-factor authentication is enabled, password login continues through Fortify’s normal TOTP/recovery-code challenge.
+
+**Passkey login:** Native Fortify passkey authentication completes the session directly and does **not** route through the password-login two-factor challenge.
+
+**Passkey metadata:** The settings passkey list API returns display metadata only (name, authenticator label, human-readable timestamps). Credential material is never exposed to the frontend.
 
 Split-origin deployments need correct `SANCTUM_STATEFUL_DOMAINS`, session cookie domain/SameSite, CORS, and CSRF configuration. That layout is out of scope for the default kit.
 
@@ -210,7 +242,7 @@ The Laravel installer may also offer Boost during `laravel new`. Generated Boost
 
 ## Attribution
 
-UI and developer experience inspired by Laravel’s official [React starter kit](https://github.com/laravel/react-starter-kit).
+UI and developer experience inspired by Laravel’s official [React starter kit](https://github.com/laravel/react-starter-kit), including passkey UI patterns.
 
 This community project is independent of Laravel and is **not** an official starter kit maintained by Laravel. See [`NOTICE.md`](NOTICE.md) for third-party notices.
 

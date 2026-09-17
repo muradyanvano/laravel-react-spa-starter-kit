@@ -2,6 +2,7 @@ import AlertError from '@/components/alert-error';
 import { DocumentTitle } from '@/components/document-title';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import ManagePasskeys from '@/components/manage-passkeys';
 import ManageTwoFactor from '@/components/manage-two-factor';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
@@ -335,6 +336,10 @@ export default function Security() {
                         requiresConfirmation={settings.requiresConfirmation}
                         twoFactorEnabled={settings.twoFactorEnabled}
                         onUpdated={loadSettings}
+                    />
+
+                    <ManagePasskeys
+                        canManagePasskeys={settings.canManagePasskeys}
                     />
                 </>
             ) : null}

@@ -2,13 +2,15 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "muradyanvano/laravel-react-spa-starter-kit",
     "type": "project",
-    "description": "Community Laravel React SPA starter kit (no Inertia) using React Router, Fortify, Sanctum, Wayfinder, and Vite.",
+    "description": "Community Laravel React SPA starter kit (no Inertia) using React Router, Fortify, Sanctum, passkeys/WebAuthn, Wayfinder, and Vite.",
     "keywords": [
         "laravel",
         "react",
         "spa",
         "sanctum",
         "fortify",
+        "passkeys",
+        "webauthn",
         "react-router",
         "wayfinder",
         "typescript"
