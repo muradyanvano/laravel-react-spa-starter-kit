@@ -57,10 +57,8 @@ npm run dev
 Pin a specific version when you need a reproducible install:
 
 ```bash
-composer create-project muradyanvano/laravel-react-spa-starter-kit my-app v1.0.0
+composer create-project muradyanvano/laravel-react-spa-starter-kit my-app v1.1.0
 ```
-
-> **Note:** Passkey support ships in **v1.1.0**. The latest stable tag on Packagist is still **v1.0.0** until v1.1.0 is published.
 
 ### Requirements
 

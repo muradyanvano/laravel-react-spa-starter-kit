@@ -4,7 +4,7 @@
 
 | Version                                                                         | Supported                         |
 | ------------------------------------------------------------------------------- | --------------------------------- |
-| Latest stable release (currently `v1.0.0`; `v1.1.0` pending publication)        | Yes                               |
+| Latest stable release (currently `v1.1.0`)                                      | Yes                               |
 | Older stable releases                                                           | No guarantee of security fixes    |
 | Development branches (`main` before a release cut, `develop`, feature branches) | Not treated as supported releases |
 
@@ -27,7 +27,7 @@ If that option is unavailable, open a private security advisory request through 
 
 Please include:
 
-- Affected version (for example `v1.0.0`) or commit SHA
+- Affected version (for example `v1.1.0`) or commit SHA
 - Clear description of the vulnerability
 - Steps to reproduce
 - Expected vs actual behavior
