@@ -12,5 +12,20 @@
 - In development, React StrictMode intentionally remounts effects once. AbortController cleanup cancels the first in-flight bootstrap request; the remount’s request completes. That canceled→200 DevTools pair is expected in development only. Production mounts once. Do not disable StrictMode, add module-level init flags, artificial delays, or promise caches solely to hide this.
 - Password confirmation (HTTP 423) is handled contextually by sensitive callers via `navigateToConfirmPasswordIfRequired`, not as a global Axios navigation side effect.
 - Two-factor secrets, QR payloads, and recovery codes are Fortify-owned and must never be logged, stored in browser storage, or included on the current-user endpoint.
-- Passkeys are a Fortify transitive dependency (`laravel/passkeys`). They are not part of this kit's default UI; leave them disabled/deferred unless explicitly requested.
+- Fortify passkeys are enabled (`Features::passkeys(['confirmPassword' => true])`). Native Fortify routes own WebAuthn ceremonies (`/passkeys/*`, `/user/passkeys/*`); do not duplicate them under `/api`.
+- Safe passkey metadata for Settings lives at `GET /api/v1/settings/passkeys` via `PasskeyResource`. Security settings expose `canManagePasskeys` capability only; P3 lazily loads the dedicated list.
+- Never serialize raw credential, credential_id, user_handle, challenge, or other WebAuthn secrets in app JSON resources.
+- Passkey registration and deletion require Fortify password confirmation (`423` when unconfirmed). Login and passkey confirmation ceremonies do not.
+- Passkey login uses `PasskeyLoginController`, which calls `$guard->login()` directly and does not enter Fortify's `RedirectIfTwoFactorAuthenticatable` flow.
+- `@laravel/passkeys` owns WebAuthn ceremonies via `PasskeyVerify` (`resources/js/components/passkey-verify.tsx`). Axios/`ensureCsrfCookie()` remain the CSRF owner; call `preparePasskeyCeremony()` before each ceremony.
+- Configure the passkeys client once in `resources/js/app.tsx` via `configurePasskeysClient()`.
+- Login owns `refreshUser()` exactly once after passkey success, then navigates with `getPostAuthPath()`. Passkey confirmation does not refresh current user.
+- WebAuthn user cancellation is silent (no toast/navigation/retry). Do not auto-replay ceremonies on 419/429/5xx.
+- Conditional autofill is deferred; official React kit uses manual-button-only `PasskeyVerify` without `autofill: true`.
+- Security owns passkey management UI (`ManagePasskeys`, `PasskeyRegister`, `PasskeyItem`). The passkey collection is fetched lazily from `GET /api/v1/settings/passkeys` only after Security loads and `canManagePasskeys === true`; it stays local component state, not auth state.
+- Registration is owned by `@laravel/passkeys` (`usePasskeyRegister` + `preparePasskeyCeremony()`). Deletion uses Axios (`DELETE /user/passkeys/{id}` via `settings-api`).
+- Successful register/delete refreshes the passkey list only (`GET /api/v1/settings/passkeys` ×1). Do not call `refreshUser()` or refetch Security settings for passkey mutations.
+- Passkey mutation 423 uses contextual `navigateToConfirmPasswordIfRequired` (supports Axios and `PasskeyError`). No mutation replay after confirmation.
+- Unsupported browsers still show/delete existing passkeys; registration UI is hidden when `isSupported` is false.
+- Recovery codes remain lazy-loaded; passkey management must not trigger recovery-code requests.
 - Keep UI aligned with Laravel's official React starter kit; architecture differs, visual UX should not.

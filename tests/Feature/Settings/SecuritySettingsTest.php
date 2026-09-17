@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Factories\PasskeyFactory;
 
 test('authenticated verified users can fetch security settings', function () {
     $user = User::factory()->create();
@@ -9,6 +10,7 @@ test('authenticated verified users can fetch security settings', function () {
         ->getJson('/api/v1/settings/security')
         ->assertOk()
         ->assertJsonPath('data.canManageTwoFactor', true)
+        ->assertJsonPath('data.canManagePasskeys', true)
         ->assertJsonPath('data.twoFactorEnabled', false)
         ->assertJsonPath('data.requiresConfirmation', true)
         ->assertJsonStructure(['data' => ['passwordRules']]);
@@ -33,4 +35,17 @@ test('unverified users cannot fetch security settings', function () {
     $this->actingAs($user)
         ->getJson('/api/v1/settings/security')
         ->assertForbidden();
+});
+
+test('security settings expose passkey capability without embedding passkeys', function () {
+    $user = User::factory()->create();
+    PasskeyFactory::new()->for($user)->create();
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/v1/settings/security')
+        ->assertOk()
+        ->assertJsonPath('data.canManagePasskeys', true);
+
+    expect($response->json('data'))->not->toHaveKey('passkeys');
+    expect(json_encode($response->json()))->not->toContain('credential');
 });

@@ -4,7 +4,7 @@
 
 | Version                                                                         | Supported                         |
 | ------------------------------------------------------------------------------- | --------------------------------- |
-| Latest stable release (currently `v1.0.0`)                                      | Yes                               |
+| Latest stable release (currently `v1.0.0`; `v1.1.0` pending publication)        | Yes                               |
 | Older stable releases                                                           | No guarantee of security fixes    |
 | Development branches (`main` before a release cut, `develop`, feature branches) | Not treated as supported releases |
 

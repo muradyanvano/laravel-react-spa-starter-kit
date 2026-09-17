@@ -1,5 +1,6 @@
 import { useAuth } from '@/auth/auth-provider';
 import { DocumentTitle } from '@/components/document-title';
+import PasskeyVerify from '@/components/passkey-verify';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -12,6 +13,7 @@ import { fieldDescribedBy, fieldErrorId, useForm } from '@/hooks/use-form';
 import AuthLayout from '@/layouts/auth-layout';
 import { login as loginRequest } from '@/lib/auth-api';
 import { getPostAuthPath } from '@/lib/navigation';
+import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 const canResetPassword = true;
@@ -35,12 +37,26 @@ export default function Login() {
         '/dashboard',
     );
 
+    const handlePasskeyLoginSuccess = useCallback(async () => {
+        const user = await refreshUser();
+
+        if (user && user.email_verified_at === null) {
+            await navigate('/verify-email', { replace: true });
+
+            return;
+        }
+
+        await navigate(intended, { replace: true });
+    }, [intended, navigate, refreshUser]);
+
     return (
         <AuthLayout
             title="Log in to your account"
             description="Enter your email and password below to log in"
         >
             <DocumentTitle title="Log in" />
+
+            <PasskeyVerify onSuccess={handlePasskeyLoginSuccess} />
 
             <form
                 className="flex flex-col gap-6"

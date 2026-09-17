@@ -1,6 +1,23 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterEach, vi } from 'vitest';
+
+vi.mock('@laravel/passkeys/react', () => ({
+    usePasskeyVerify: vi.fn(() => ({
+        verify: vi.fn(),
+        isLoading: false,
+        error: null,
+        errorInstance: null,
+        isSupported: false,
+    })),
+    usePasskeyRegister: vi.fn(() => ({
+        register: vi.fn(),
+        isLoading: false,
+        error: null,
+        errorInstance: null,
+        isSupported: false,
+    })),
+}));
 
 afterEach(() => {
     cleanup();

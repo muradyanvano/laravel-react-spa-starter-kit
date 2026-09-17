@@ -2,12 +2,14 @@ import { AuthProvider } from '@/auth/auth-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
+import { configurePasskeysClient } from '@/lib/passkeys';
 import { router } from '@/router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 
 initializeTheme();
+configurePasskeysClient();
 
 const rootElement = document.getElementById('app');
 
